@@ -19,6 +19,13 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
     'Content-Type': 'application/json',
   };
 
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('session_token');
+    if (token) {
+      defaultHeaders['Authorization'] = `Bearer ${token}`;
+    }
+  }
+
   const config: RequestInit = {
     ...options,
     headers: {
@@ -45,12 +52,29 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
 export const api = {
   // Auth
   auth: {
-    signup: (data: { email?: string; password?: string; full_name?: string }) =>
-      request('/auth/signup', { method: 'POST', body: JSON.stringify(data) }),
-    login: (data: { email?: string; password?: string }) =>
-      request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
-    logout: () =>
-      request('/auth/logout', { method: 'POST' }),
+    signup: async (data: { email?: string; password?: string; full_name?: string }) => {
+      const res = await request('/auth/signup', { method: 'POST', body: JSON.stringify(data) });
+      if (typeof window !== 'undefined' && res.data?.session_token) {
+        localStorage.setItem('session_token', res.data.session_token);
+      }
+      return res;
+    },
+    login: async (data: { email?: string; password?: string }) => {
+      const res = await request('/auth/login', { method: 'POST', body: JSON.stringify(data) });
+      if (typeof window !== 'undefined' && res.data?.session_token) {
+        localStorage.setItem('session_token', res.data.session_token);
+      }
+      return res;
+    },
+    logout: async () => {
+      try {
+        await request('/auth/logout', { method: 'POST' });
+      } finally {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('session_token');
+        }
+      }
+    },
     me: () =>
       request('/auth/me', { method: 'GET' }),
   },
