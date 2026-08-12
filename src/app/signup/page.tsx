@@ -50,6 +50,27 @@ export default function SignupPage() {
     }
   };
 
+  const [resendStatus, setResendStatus] = useState('');
+  const [resending, setResending] = useState(false);
+
+  const handleResend = async () => {
+    if (!submittedEmail) return;
+    try {
+      setResending(true);
+      setResendStatus('');
+      const res = await api.auth.resendVerification(submittedEmail);
+      if (res.success) {
+        setResendStatus('Verification email resent! Please check your inbox.');
+      } else {
+        setResendStatus(res.error?.message || 'Failed to resend email.');
+      }
+    } catch (err: any) {
+      setResendStatus(err.message || 'Failed to resend email.');
+    } finally {
+      setResending(false);
+    }
+  };
+
   return (
     <div className="auth-container" style={{ maxWidth: '440px' }}>
       {submittedEmail ? (
@@ -61,9 +82,26 @@ export default function SignupPage() {
           <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
             We've sent a verification link to <strong>{submittedEmail}</strong>. Please check your inbox and click the link to activate your account.
           </p>
-          <Link href="/login" className="btn btn-primary" style={{ display: 'inline-block', width: '100%', textDecoration: 'none' }}>
-            Go to Sign In
-          </Link>
+
+          {resendStatus && (
+            <div style={{ padding: '0.75rem', borderRadius: '6px', background: resendStatus.includes('resent') ? '#ecfdf5' : 'var(--accent-rose-bg)', color: resendStatus.includes('resent') ? '#059669' : 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1rem' }}>
+              {resendStatus}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <button
+              onClick={handleResend}
+              className="btn"
+              disabled={resending}
+              style={{ width: '100%', background: 'var(--bg-subtle)', border: '1px solid var(--border-subtle)', cursor: 'pointer' }}
+            >
+              {resending ? 'Resending Email...' : 'Resend Verification Email'}
+            </button>
+            <Link href="/login" className="btn btn-primary" style={{ display: 'inline-block', width: '100%', textDecoration: 'none' }}>
+              Go to Sign In
+            </Link>
+          </div>
         </div>
       ) : (
         <>

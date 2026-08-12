@@ -82,6 +82,8 @@ export const api = {
       }
       return res;
     },
+    resendVerification: (email: string) =>
+      request('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }),
     me: () =>
       request('/auth/me', { method: 'GET' }),
   },

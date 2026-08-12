@@ -48,6 +48,29 @@ function VerifyEmailContent() {
     };
   }, [searchParams, router, setUser]);
 
+  const [resendEmail, setResendEmail] = useState('');
+  const [resendStatus, setResendStatus] = useState('');
+  const [resending, setResending] = useState(false);
+
+  const handleResend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resendEmail) return;
+    try {
+      setResending(true);
+      setResendStatus('');
+      const res = await api.auth.resendVerification(resendEmail);
+      if (res.success) {
+        setResendStatus('Verification link sent! Check your inbox.');
+      } else {
+        setResendStatus(res.error?.message || 'Failed to resend email.');
+      }
+    } catch (err: any) {
+      setResendStatus(err.message || 'Failed to resend email.');
+    } finally {
+      setResending(false);
+    }
+  };
+
   return (
     <div className="auth-container" style={{ maxWidth: '480px', margin: '4rem auto', textAlign: 'center' }}>
       {status === 'loading' && (
@@ -74,7 +97,29 @@ function VerifyEmailContent() {
             Verification Failed
           </h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{message}</p>
-          <a href="/login" className="btn btn-primary" style={{ display: 'inline-block', textDecoration: 'none' }}>
+
+          <form onSubmit={handleResend} style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
+            <div className="form-group" style={{ marginBottom: '0.75rem' }}>
+              <input
+                type="email"
+                placeholder="Enter your .edu email to resend"
+                value={resendEmail}
+                onChange={(e) => setResendEmail(e.target.value)}
+                required
+                style={{ width: '100%', padding: '0.625rem', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}
+              />
+            </div>
+            {resendStatus && (
+              <p style={{ fontSize: '0.875rem', color: resendStatus.includes('sent') ? '#10b981' : 'var(--accent-rose)', marginBottom: '0.75rem' }}>
+                {resendStatus}
+              </p>
+            )}
+            <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={resending}>
+              {resending ? 'Sending Email...' : 'Resend Verification Email'}
+            </button>
+          </form>
+
+          <a href="/login" style={{ color: 'var(--text-muted)', fontSize: '0.875rem', textDecoration: 'underline' }}>
             Back to Sign In
           </a>
         </div>
