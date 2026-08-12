@@ -75,6 +75,13 @@ export const api = {
         }
       }
     },
+    verifyEmail: async (token: string) => {
+      const res = await request(`/auth/verify-email?token=${encodeURIComponent(token)}`, { method: 'GET' });
+      if (typeof window !== 'undefined' && res.data?.session_token) {
+        localStorage.setItem('session_token', res.data.session_token);
+      }
+      return res;
+    },
     me: () =>
       request('/auth/me', { method: 'GET' }),
   },
