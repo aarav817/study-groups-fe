@@ -87,7 +87,7 @@ export default function DirectMessagesPage() {
       setSendingReq(true);
       const res = await api.messages.sendChatRequest({ messaging_code: messagingCodeInput.trim() });
       if (res.success) {
-        setRequestMsg('Direct chat request sent!');
+        setRequestMsg('Direct chat request sent.');
         setMessagingCodeInput('');
         loadDirectChats();
       } else {
@@ -131,51 +131,52 @@ export default function DirectMessagesPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Direct Messages</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-            Private 1-on-1 chats with verified university classmates.
+          <p className="page-subtitle">
+            Private 1-on-1 peer chats with verified university classmates.
           </p>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '1.25rem', minHeight: '500px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '1rem', minHeight: '480px' }}>
         {/* Left Sidebar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {/* Send Chat Request */}
-          <div className="card" style={{ padding: '1rem' }}>
-            <h3 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.35rem' }}>Send Chat Request</h3>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {/* Send Chat Request Card */}
+          <div className="card" style={{ padding: '0.875rem' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary-navy)', marginBottom: '0.2rem' }}>
+              Request Direct Chat
+            </div>
+            <p style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
               Enter a classmate&apos;s 6-character user code.
             </p>
-            {requestMsg && <div style={{ padding: '0.35rem 0.5rem', borderRadius: '4px', background: 'var(--accent-emerald-bg)', color: 'var(--accent-emerald)', fontSize: '0.75rem', marginBottom: '0.5rem' }}>{requestMsg}</div>}
-            {requestError && <div style={{ padding: '0.35rem 0.5rem', borderRadius: '4px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)', fontSize: '0.75rem', marginBottom: '0.5rem' }}>{requestError}</div>}
+            {requestMsg && <div className="alert-banner alert-success" style={{ padding: '0.35rem 0.5rem', fontSize: '0.71875rem', marginBottom: '0.4rem' }}><span>{requestMsg}</span></div>}
+            {requestError && <div className="alert-banner alert-danger" style={{ padding: '0.35rem 0.5rem', fontSize: '0.71875rem', marginBottom: '0.4rem' }}><span>{requestError}</span></div>}
             <form onSubmit={handleSendChatRequest} style={{ display: 'flex', gap: '0.35rem' }}>
               <input
                 type="text"
-                className="form-control"
                 placeholder="Code (e.g. AB12CD)"
                 value={messagingCodeInput}
                 onChange={(e) => setMessagingCodeInput(e.target.value.toUpperCase())}
-                style={{ padding: '0.45rem 0.65rem', fontSize: '0.8rem' }}
+                style={{ padding: '0.35rem 0.5rem', fontSize: '0.78125rem' }}
                 required
               />
-              <button type="submit" className="btn btn-primary btn-sm" disabled={sendingReq}>
-                Send
+              <button type="submit" className="btn btn-navy btn-xs" disabled={sendingReq}>
+                Request
               </button>
             </form>
           </div>
 
           {/* Pending Requests */}
           {pendingRequests.length > 0 && (
-            <div className="card" style={{ padding: '0.875rem', border: '1px solid var(--accent-rose-bg)', backgroundColor: '#fff1f2' }}>
-              <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-rose)', marginBottom: '0.5rem' }}>
+            <div className="card" style={{ padding: '0.75rem', border: '1px solid var(--accent-amber-border)', backgroundColor: 'var(--accent-amber-bg)' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-amber)', marginBottom: '0.35rem' }}>
                 Pending Requests ({pendingRequests.length})
-              </h4>
+              </div>
               {pendingRequests.map((req) => (
-                <div key={req.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem', fontSize: '0.8rem' }}>
-                  <span>{req.sender_name}</span>
-                  <div style={{ display: 'flex', gap: '0.2rem' }}>
-                    <button onClick={() => handleRespond(req.id, 'accept')} className="btn btn-primary btn-sm" style={{ padding: '2px 6px' }}>Accept</button>
-                    <button onClick={() => handleRespond(req.id, 'decline')} className="btn btn-secondary btn-sm" style={{ padding: '2px 6px' }}>Decline</button>
+                <div key={req.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem', fontSize: '0.75rem' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{req.sender_name}</span>
+                  <div style={{ display: 'flex', gap: '0.25rem' }}>
+                    <button onClick={() => handleRespond(req.id, 'accept')} className="btn btn-navy btn-xs" style={{ padding: '2px 5px' }}>Accept</button>
+                    <button onClick={() => handleRespond(req.id, 'decline')} className="btn btn-secondary btn-xs" style={{ padding: '2px 5px' }}>Decline</button>
                   </div>
                 </div>
               ))}
@@ -183,12 +184,14 @@ export default function DirectMessagesPage() {
           )}
 
           {/* Active Chats List */}
-          <div className="card" style={{ padding: '0.875rem', flex: 1 }}>
-            <h3 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>Conversations</h3>
+          <div className="card" style={{ padding: '0.75rem', flex: 1 }}>
+            <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+              Conversations
+            </div>
             {activeChats.length === 0 ? (
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>No active direct chats yet.</p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>No active direct chats yet.</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                 {activeChats.map((chat) => (
                   <button
                     key={chat.id}
@@ -196,21 +199,24 @@ export default function DirectMessagesPage() {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.625rem',
-                      padding: '0.5rem 0.65rem',
-                      borderRadius: '6px',
-                      border: selectedPartner?.id === chat.id ? '1.5px solid var(--primary-color)' : '1px solid var(--border-color)',
-                      backgroundColor: selectedPartner?.id === chat.id ? 'var(--primary-light)' : '#ffffff',
+                      gap: '0.5rem',
+                      padding: '0.4rem 0.55rem',
+                      borderRadius: 'var(--radius-sm)',
+                      border: selectedPartner?.id === chat.id ? '1px solid var(--primary-color)' : '1px solid transparent',
+                      backgroundColor: selectedPartner?.id === chat.id ? 'var(--primary-subtle)' : 'transparent',
                       cursor: 'pointer',
                       textAlign: 'left',
+                      width: '100%',
                     }}
                   >
-                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'var(--primary-color)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '0.8rem' }}>
+                    <div className="avatar-circle" style={{ width: '22px', height: '22px', fontSize: '0.6875rem' }}>
                       {chat.partner_name.charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <div style={{ fontWeight: 500, fontSize: '0.85rem', color: 'var(--text-color)' }}>{chat.partner_name}</div>
-                      <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>{chat.partner_code}</div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 500, fontSize: '0.78125rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {chat.partner_name}
+                      </div>
+                      <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>{chat.partner_code}</div>
                     </div>
                   </button>
                 ))}
@@ -219,21 +225,23 @@ export default function DirectMessagesPage() {
           </div>
         </div>
 
-        {/* Right Active Message Box - Compact Slim Chat Lines */}
-        <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
+        {/* Right Active Message Box */}
+        <div className="card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column' }}>
           {selectedPartner ? (
             <>
-              <div style={{ paddingBottom: '0.625rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-subtle)', marginBottom: '0.65rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <h2 style={{ fontSize: '1.1rem', fontWeight: 600 }}>{selectedPartner.partner_name}</h2>
-                  <span className="badge badge-purple" style={{ marginTop: '0.15rem' }}>Code: {selectedPartner.partner_code}</span>
+                  <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--primary-navy)' }}>{selectedPartner.partner_name}</h2>
+                  <span className="badge badge-navy" style={{ marginTop: '0.15rem' }}>Code: {selectedPartner.partner_code}</span>
                 </div>
               </div>
 
-              {/* SLIM COMPACT CHAT BUBBLES */}
-              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '0.75rem', maxHeight: '420px', paddingRight: '0.5rem' }}>
+              {/* Chat Thread */}
+              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.3rem', marginBottom: '0.65rem', maxHeight: '380px', paddingRight: '0.25rem' }}>
                 {messages.length === 0 ? (
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: 'auto' }}>No direct messages yet. Say hi! 👋</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', textAlign: 'center', margin: 'auto' }}>
+                    No messages in this chat yet. Send a message below.
+                  </div>
                 ) : (
                   messages.map((m) => {
                     const isPartner = m.sender_id === selectedPartner.partner_id;
@@ -243,13 +251,13 @@ export default function DirectMessagesPage() {
                         key={m.id}
                         style={{
                           alignSelf: isPartner ? 'flex-start' : 'flex-end',
-                          backgroundColor: isPartner ? 'var(--panel-bg)' : 'var(--primary-color)',
-                          color: isPartner ? 'var(--text-color)' : '#ffffff',
-                          border: isPartner ? '1px solid var(--border-color)' : 'none',
-                          padding: '0.35rem 0.75rem',
-                          borderRadius: '6px',
+                          backgroundColor: isPartner ? 'var(--bg-subtle)' : 'var(--primary-navy)',
+                          color: isPartner ? 'var(--text-primary)' : '#ffffff',
+                          border: isPartner ? '1px solid var(--border-default)' : 'none',
+                          padding: '0.35rem 0.65rem',
+                          borderRadius: 'var(--radius-sm)',
                           maxWidth: '75%',
-                          fontSize: '0.85rem',
+                          fontSize: '0.8125rem',
                           lineHeight: 1.4,
                         }}
                       >
@@ -260,23 +268,22 @@ export default function DirectMessagesPage() {
                 )}
               </div>
 
-              <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '0.5rem' }}>
+              <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '0.4rem' }}>
                 <input
                   type="text"
-                  className="form-control"
                   placeholder="Type a private message..."
                   value={newMsg}
                   onChange={(e) => setNewMsg(e.target.value)}
-                  style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
+                  style={{ padding: '0.4rem 0.65rem', fontSize: '0.8125rem' }}
                 />
-                <button type="submit" className="btn btn-primary btn-sm">
+                <button type="submit" className="btn btn-navy btn-sm">
                   Send
                 </button>
               </form>
             </>
           ) : (
-            <div style={{ margin: 'auto', color: 'var(--text-muted)', fontSize: '0.875rem', textAlign: 'center' }}>
-              Select a direct chat partner or enter a 6-character user code to start chatting.
+            <div style={{ margin: 'auto', color: 'var(--text-muted)', fontSize: '0.8125rem', textAlign: 'center' }}>
+              Select a conversation from the left or enter a user code to start chatting.
             </div>
           )}
         </div>

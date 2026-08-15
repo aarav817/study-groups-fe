@@ -4,15 +4,12 @@ import MessagesPage from '../src/app/messages/page';
 jest.mock('../src/lib/api', () => ({
   api: {
     messages: {
-      getChatRequests: jest.fn().mockResolvedValue({
-        success: true,
-        data: { requests: [] },
-      }),
-      getContacts: jest.fn().mockResolvedValue({
+      getDirectChats: jest.fn().mockResolvedValue({
         success: true,
         data: {
-          contacts: [
-            { id: 'u-1', full_name: 'Bob Stanford', messaging_code: 'BOB123', avatar_url: null },
+          pending_requests: [],
+          active_chats: [
+            { id: 'c-1', partner_id: 'u-1', partner_name: 'Bob Stanford', partner_code: 'BOB123', partner_avatar: null },
           ],
         },
       }),
@@ -20,18 +17,21 @@ jest.mock('../src/lib/api', () => ({
         success: true,
         data: { messages: [] },
       }),
+      sendChatRequest: jest.fn(),
+      sendDirectMessage: jest.fn(),
     },
   },
 }));
 
 describe('Direct Messages Workspace (Jest + React Testing Library)', () => {
-  test('renders messaging workspace with contacts list and chat request form', async () => {
+  test('renders messaging workspace with conversations list and chat request form', async () => {
     render(<MessagesPage />);
 
-    expect(screen.getByText(/direct messages workspace/i)).toBeInTheDocument();
-    expect(screen.getByText(/my contacts/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Bob Stanford/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/6-character messaging code/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /📩 request chat/i })).toBeInTheDocument();
+    expect(screen.getByText(/direct messages/i)).toBeInTheDocument();
+    expect(screen.getByText(/conversations/i)).toBeInTheDocument();
+    const matches = await screen.findAllByText(/Bob Stanford/i);
+    expect(matches.length).toBeGreaterThan(0);
+    expect(screen.getByPlaceholderText(/code \(e\.g\. AB12CD\)/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /request/i })).toBeInTheDocument();
   });
 });

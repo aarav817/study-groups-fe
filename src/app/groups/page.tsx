@@ -144,108 +144,72 @@ export default function GroupsPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">
-            {viewTab === 'public' ? 'Top Public Study Groups' : 'My Study Groups'}
+            {viewTab === 'public' ? 'Public Study Groups' : 'My Study Groups'}
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+          <p className="page-subtitle">
             {viewTab === 'public'
-              ? 'Explore open study groups across courses and subjects'
-              : 'Study groups you are currently a member of'}
+              ? 'Discover open academic study channels across university departments'
+              : 'Active study groups where you are currently enrolled'}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <button
-            className={`btn ${viewTab === 'public' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setViewTab('public')}
-            title="Browse top public groups"
-          >
-            🌐 Top Public Groups
-          </button>
 
-          {myGroups.length > 0 && (
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="segmented-control">
             <button
-              className={`btn ${viewTab === 'my' ? 'btn-primary' : 'btn-secondary'}`}
+              className={`segmented-item ${viewTab === 'public' ? 'active' : ''}`}
+              onClick={() => setViewTab('public')}
+            >
+              Public Directory
+            </button>
+            <button
+              className={`segmented-item ${viewTab === 'my' ? 'active' : ''}`}
               onClick={() => setViewTab('my')}
             >
-              📚 My Groups ({myGroups.length})
+              My Groups ({myGroups.length})
             </button>
-          )}
+          </div>
 
-          <button className="btn btn-secondary" onClick={() => setShowInviteModal(true)}>
-            🔗 Join via Invite Link
+          <button className="btn btn-secondary btn-sm" onClick={() => setShowInviteModal(true)}>
+            Join via Invite Code
           </button>
 
-          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
-            + Create New Group
+          <button className="btn btn-navy btn-sm" onClick={() => setShowCreateModal(true)}>
+            + Create Group
           </button>
         </div>
       </div>
 
-      {/* In-App Error Notification Banner */}
+      {/* Error notification */}
       {joinError && (
-        <div
-          style={{
-            padding: '0.85rem 1.25rem',
-            marginBottom: '1.5rem',
-            borderRadius: '8px',
-            background: 'var(--accent-rose-bg, rgba(225, 29, 72, 0.1))',
-            border: '1px solid var(--accent-rose, #e11d48)',
-            color: 'var(--accent-rose, #e11d48)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            fontSize: '0.875rem',
-            fontWeight: 500,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span>⚠️</span>
-            <span>{joinError}</span>
-          </div>
+        <div className="alert-banner alert-danger">
+          <span>{joinError}</span>
           <button
             onClick={() => setJoinError('')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'inherit',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              fontSize: '1rem',
-              lineHeight: 1,
-            }}
-            title="Dismiss error"
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
           >
-            ✕
+            Dismiss
           </button>
         </div>
       )}
 
-      {/* Zero Groups Info Notice (No Duplicated Action Buttons) */}
-      {myGroups.length === 0 && !loading && (
-        <div
-          className="card"
-          style={{
-            padding: '1rem 1.25rem',
-            marginBottom: '1.5rem',
-            background: 'var(--card-hover-bg, rgba(99, 102, 241, 0.05))',
-            border: '1px solid var(--border-color)',
-            borderRadius: '8px',
-          }}
-        >
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 600, margin: 0, marginBottom: '0.25rem' }}>
-            You haven&apos;t joined any study groups yet
+      {/* Zero Groups Notice */}
+      {myGroups.length === 0 && !loading && viewTab === 'my' && (
+        <div className="card" style={{ marginBottom: '1rem', padding: '0.875rem 1rem' }}>
+          <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary-navy)' }}>
+            No enrolled study groups yet
           </h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
-            Showing top public study groups by default. Join a public group below or use the buttons above to create your own!
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.78125rem', marginTop: '0.15rem' }}>
+            Switch to the Public Directory below to find study groups, or use the buttons above to create your own.
           </p>
         </div>
       )}
 
-      {/* Search Bar */}
-      <div style={{ marginBottom: '1.5rem', maxWidth: '400px' }}>
+      {/* Search Input */}
+      <div style={{ marginBottom: '1rem', maxWidth: '340px' }}>
         <input
           type="text"
           className="form-control"
-          placeholder={viewTab === 'public' ? 'Search top public groups...' : 'Search your groups...'}
+          placeholder={viewTab === 'public' ? 'Filter public groups by course or title...' : 'Filter your groups...'}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -253,17 +217,20 @@ export default function GroupsPage() {
 
       {/* Group Cards Grid */}
       {loading ? (
-        <p>Loading study groups...</p>
+        <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', padding: '1rem 0' }}>Loading study groups...</p>
       ) : activeGroupList.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1.5rem', maxWidth: '600px', margin: '2rem auto' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-            {viewTab === 'public' ? 'No public study groups found' : "You haven't joined any study groups yet"}
+        <div className="card" style={{ textAlign: 'center', padding: '2.5rem 1.5rem', maxWidth: '480px', margin: '1.5rem auto' }}>
+          <h2 className="card-title" style={{ fontSize: '1.1rem', marginBottom: '0.35rem' }}>
+            {viewTab === 'public' ? 'No public study groups found' : 'No enrolled study groups'}
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', lineHeight: 1.5 }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', lineHeight: 1.45, marginBottom: '1rem' }}>
             {viewTab === 'public'
-              ? 'Be the first to create a public study group for your course or major!'
-              : 'Create a new group for your course or paste an invite link from a classmate to start collaborating!'}
+              ? 'Be the first to create a public study group for your course or department.'
+              : 'Create a group or paste an invite code from a classmate to begin.'}
           </p>
+          <button className="btn btn-navy btn-sm" onClick={() => setShowCreateModal(true)}>
+            Create New Study Group
+          </button>
         </div>
       ) : (
         <div className="cards-grid">
@@ -272,27 +239,23 @@ export default function GroupsPage() {
 
             return (
               <div key={group.id} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.35rem' }}>
                   <Link
                     href={`/groups/${group.id}`}
                     className="card-title"
-                    style={{ color: 'inherit', textDecoration: 'none' }}
+                    style={{ color: 'var(--primary-navy)', textDecoration: 'none' }}
                   >
                     {group.title}
                   </Link>
 
-                  <div style={{ display: 'flex', gap: '0.35rem', flexShrink: 0 }}>
+                  <div style={{ display: 'flex', gap: '0.25rem', flexShrink: 0 }}>
                     {group.is_public !== false ? (
-                      <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
-                        🌐 Public
-                      </span>
+                      <span className="badge badge-blue">Public</span>
                     ) : (
-                      <span className="badge" style={{ background: 'rgba(107, 114, 128, 0.1)', color: '#6b7280' }}>
-                        🔒 Private
-                      </span>
+                      <span className="badge badge-navy">Private</span>
                     )}
 
-                    {isMember && <span className="badge badge-emerald">Joined</span>}
+                    {isMember && <span className="badge badge-emerald">Enrolled</span>}
                   </div>
                 </div>
 
@@ -300,24 +263,24 @@ export default function GroupsPage() {
 
                 <div className="card-meta">
                   <span>Created by {group.creator_name}</span>
-                  <span style={{ fontWeight: 600 }}>
-                    {group.member_count} {group.member_count === 1 ? 'Member' : 'Members'}
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {group.member_count} {group.member_count === 1 ? 'member' : 'members'}
                   </span>
                 </div>
 
-                <div style={{ marginTop: '1rem' }}>
+                <div style={{ marginTop: '0.75rem' }}>
                   {isMember ? (
                     <Link href={`/groups/${group.id}`} className="btn btn-secondary btn-sm" style={{ width: '100%' }}>
-                      Open Group Workspace
+                      Open Workspace
                     </Link>
                   ) : (
                     <button
-                      className="btn btn-primary btn-sm"
+                      className="btn btn-navy btn-sm"
                       style={{ width: '100%' }}
                       disabled={joiningGroupId === group.id}
                       onClick={() => handleJoinPublicGroup(group.id)}
                     >
-                      {joiningGroupId === group.id ? 'Joining...' : '+ Join Group'}
+                      {joiningGroupId === group.id ? 'Joining...' : 'Join Group'}
                     </button>
                   )}
                 </div>
@@ -327,34 +290,25 @@ export default function GroupsPage() {
         </div>
       )}
 
-      {/* Create Group Modal with Visibility Selector */}
+      {/* Create Group Modal */}
       {showCreateModal && (
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Create Study Group</h2>
+            <h2 className="modal-title">Create Study Group</h2>
+            <p className="modal-subtitle">Set up a course channel for collaboration and file sharing.</p>
 
             {createError && (
-              <div
-                style={{
-                  padding: '0.75rem',
-                  borderRadius: '6px',
-                  background: 'var(--accent-rose-bg)',
-                  color: 'var(--accent-rose)',
-                  fontSize: '0.875rem',
-                  marginBottom: '1rem',
-                }}
-              >
-                {createError}
+              <div className="alert-banner alert-danger">
+                <span>{createError}</span>
               </div>
             )}
 
             <form onSubmit={handleCreateGroup}>
               <div className="form-group">
-                <label htmlFor="groupTitle">Course Title</label>
+                <label htmlFor="groupTitle">Course / Group Title</label>
                 <input
                   type="text"
                   id="groupTitle"
-                  className="form-control"
                   placeholder="e.g. CS 106B Programming Abstractions"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
@@ -363,70 +317,50 @@ export default function GroupsPage() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="groupDesc">Group Description</label>
+                <label htmlFor="groupDesc">Description (Optional)</label>
                 <textarea
                   id="groupDesc"
-                  className="form-control"
                   rows={3}
-                  placeholder="Brief summary of study topics, meeting goals, or target exams..."
+                  placeholder="Study topics, weekly problem sets, midterm preparation..."
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
                 />
               </div>
 
-              {/* Group Visibility Preference Buttons */}
               <div className="form-group">
-                <label style={{ display: 'block', fontWeight: 600, marginBottom: '0.5rem', fontSize: '0.875rem' }}>
-                  Group Visibility Preference
-                </label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <label>Visibility</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                   <button
                     type="button"
-                    className={`btn ${isPublic ? 'btn-primary' : 'btn-secondary'}`}
+                    className={`btn ${isPublic ? 'btn-navy' : 'btn-secondary'}`}
                     onClick={() => setIsPublic(true)}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      padding: '0.75rem 0.5rem',
-                      textAlign: 'center',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                    }}
+                    style={{ flexDirection: 'column', padding: '0.5rem', alignItems: 'flex-start' }}
                   >
-                    <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>🌐 Public</span>
-                    <span style={{ fontSize: '0.75rem', opacity: 0.85, marginTop: '0.2rem' }}>
-                      Anyone can discover and join
+                    <span style={{ fontWeight: 600, fontSize: '0.8125rem' }}>Public</span>
+                    <span style={{ fontSize: '0.6875rem', opacity: 0.8, marginTop: '2px' }}>
+                      Discoverable by all students
                     </span>
                   </button>
 
                   <button
                     type="button"
-                    className={`btn ${!isPublic ? 'btn-primary' : 'btn-secondary'}`}
+                    className={`btn ${!isPublic ? 'btn-navy' : 'btn-secondary'}`}
                     onClick={() => setIsPublic(false)}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      padding: '0.75rem 0.5rem',
-                      textAlign: 'center',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                    }}
+                    style={{ flexDirection: 'column', padding: '0.5rem', alignItems: 'flex-start' }}
                   >
-                    <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>🔒 Private</span>
-                    <span style={{ fontSize: '0.75rem', opacity: 0.85, marginTop: '0.2rem' }}>
-                      Requires invite link to join
+                    <span style={{ fontWeight: 600, fontSize: '0.8125rem' }}>Private</span>
+                    <span style={{ fontSize: '0.6875rem', opacity: 0.8, marginTop: '2px' }}>
+                      Requires invite token to join
                     </span>
                   </button>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1.25rem' }}>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowCreateModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn btn-navy btn-sm">
                   Create Group
                 </button>
               </div>
@@ -439,20 +373,12 @@ export default function GroupsPage() {
       {showInviteModal && (
         <div className="modal-overlay" onClick={() => setShowInviteModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Join Study Group via Invite</h2>
+            <h2 className="modal-title">Join Study Group via Invite</h2>
+            <p className="modal-subtitle">Enter an invite link or token string provided by a group member.</p>
 
             {inviteError && (
-              <div
-                style={{
-                  padding: '0.75rem',
-                  borderRadius: '6px',
-                  background: 'var(--accent-rose-bg)',
-                  color: 'var(--accent-rose)',
-                  fontSize: '0.875rem',
-                  marginBottom: '1rem',
-                }}
-              >
-                {inviteError}
+              <div className="alert-banner alert-danger">
+                <span>{inviteError}</span>
               </div>
             )}
 
@@ -462,7 +388,6 @@ export default function GroupsPage() {
                 <input
                   type="text"
                   id="inviteToken"
-                  className="form-control"
                   placeholder="Paste invite link or token string..."
                   value={inviteInput}
                   onChange={(e) => setInviteInput(e.target.value)}
@@ -470,11 +395,11 @@ export default function GroupsPage() {
                 />
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowInviteModal(false)}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1.25rem' }}>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowInviteModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn btn-navy btn-sm">
                   Join Group
                 </button>
               </div>

@@ -28,7 +28,7 @@ function VerifyEmailContent() {
         if (res.success && res.data?.user) {
           setUser(res.data.user);
           setStatus('success');
-          setMessage('Email verified successfully! Redirecting to study groups...');
+          setMessage('Email verified successfully. Redirecting to your workspace...');
           setTimeout(() => {
             router.push('/groups');
           }, 1500);
@@ -60,66 +60,93 @@ function VerifyEmailContent() {
       setResendStatus('');
       const res = await api.auth.resendVerification(resendEmail);
       if (res.success) {
-        setResendStatus('Verification link sent! Check your inbox.');
+        setResendStatus('Verification link sent! Please check your inbox.');
       } else {
-        setResendStatus(res.error?.message || 'Failed to resend email.');
+        setResendStatus(res.error?.message || 'Failed to resend verification email.');
       }
     } catch (err: any) {
-      setResendStatus(err.message || 'Failed to resend email.');
+      setResendStatus(err.message || 'Failed to resend verification email.');
     } finally {
       setResending(false);
     }
   };
 
   return (
-    <div className="auth-container" style={{ maxWidth: '480px', margin: '4rem auto', textAlign: 'center' }}>
+    <div className="auth-container" style={{ textAlign: 'center' }}>
+      <div className="auth-header">
+        <div className="auth-brand" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem' }}>
+          <svg style={{ width: '20px', height: '20px', color: 'var(--primary-color)', flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <span>locked in<span className="logo-period">.</span></span>
+        </div>
+        <div className="auth-tagline">A simple study platform to boost your focus.</div>
+      </div>
+
       {status === 'loading' && (
         <div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Verifying Your Account</h2>
-          <p style={{ color: 'var(--text-muted)' }}>{message}</p>
+          <span className="badge badge-navy" style={{ marginBottom: '0.75rem' }}>
+            Processing
+          </span>
+          <h2 className="modal-title" style={{ fontSize: '1.25rem', marginBottom: '0.35rem' }}>
+            Verifying Account
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>{message}</p>
         </div>
       )}
 
       {status === 'success' && (
         <div>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: '#10b981' }}>
-            Email Verified!
+          <span className="badge badge-emerald" style={{ marginBottom: '0.75rem' }}>
+            Verified
+          </span>
+          <h2 className="modal-title" style={{ fontSize: '1.25rem', marginBottom: '0.35rem' }}>
+            Email Verified
           </h2>
-          <p style={{ color: 'var(--text-muted)' }}>{message}</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>{message}</p>
         </div>
       )}
 
       {status === 'error' && (
         <div>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--accent-rose)' }}>
-            Verification Failed
+          <span className="badge badge-rose" style={{ marginBottom: '0.75rem' }}>
+            Verification Error
+          </span>
+          <h2 className="modal-title" style={{ fontSize: '1.25rem', marginBottom: '0.35rem' }}>
+            Unable to Verify
           </h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{message}</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', marginBottom: '1.25rem' }}>
+            {message}
+          </p>
 
-          <form onSubmit={handleResend} style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
-            <div className="form-group" style={{ marginBottom: '0.75rem' }}>
+          <form onSubmit={handleResend} style={{ marginBottom: '1rem', textAlign: 'left' }}>
+            <div className="form-group">
+              <label>Resend Verification Link</label>
               <input
                 type="email"
-                placeholder="Enter your .edu email to resend"
+                placeholder="Enter your .edu email"
                 value={resendEmail}
                 onChange={(e) => setResendEmail(e.target.value)}
                 required
-                style={{ width: '100%', padding: '0.625rem', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}
               />
             </div>
             {resendStatus && (
-              <p style={{ fontSize: '0.875rem', color: resendStatus.includes('sent') ? '#10b981' : 'var(--accent-rose)', marginBottom: '0.75rem' }}>
-                {resendStatus}
-              </p>
+              <div
+                className={`alert-banner ${
+                  resendStatus.includes('sent') ? 'alert-success' : 'alert-danger'
+                }`}
+                style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}
+              >
+                <span>{resendStatus}</span>
+              </div>
             )}
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={resending}>
-              {resending ? 'Sending Email...' : 'Resend Verification Email'}
+            <button type="submit" className="btn btn-navy" style={{ width: '100%' }} disabled={resending}>
+              {resending ? 'Sending...' : 'Resend Verification Email'}
             </button>
           </form>
 
-          <a href="/login" style={{ color: 'var(--text-muted)', fontSize: '0.875rem', textDecoration: 'underline' }}>
+          <a href="/login" style={{ color: 'var(--primary-color)', fontSize: '0.78125rem', fontWeight: 600 }}>
             Back to Sign In
           </a>
         </div>
@@ -130,7 +157,7 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={<div style={{ textAlign: 'center', padding: '3rem' }}>Loading...</div>}>
+    <Suspense fallback={<div style={{ textAlign: 'center', padding: '3rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>Loading verification status...</div>}>
       <VerifyEmailContent />
     </Suspense>
   );

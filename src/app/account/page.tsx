@@ -51,7 +51,7 @@ export default function AccountPage() {
 
       if (res.success && res.data?.user) {
         setUser(res.data.user);
-        setMessage('Profile updated successfully!');
+        setMessage('Profile updated successfully.');
       } else {
         setError(res.error?.message || 'Failed to update profile.');
       }
@@ -71,88 +71,89 @@ export default function AccountPage() {
   };
 
   if (!user) {
-    return <div style={{ padding: '2rem' }}>Please log in to view your account.</div>;
+    return <div style={{ padding: '2rem 0', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Please log in to view your account.</div>;
   }
 
   return (
-    <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '580px', margin: '0 auto' }}>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Account & Profile</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-            Manage your personal profile, avatar photo upload, bio, and direct messaging code.
+          <h1 className="page-title">Account Profile</h1>
+          <p className="page-subtitle">
+            Manage your personal profile, avatar photo, academic bio, and 6-character user code.
           </p>
         </div>
       </div>
 
-      <div className="card" style={{ marginBottom: '1.5rem' }}>
-        {message && <div style={{ padding: '0.75rem', borderRadius: '6px', background: 'var(--accent-emerald-bg)', color: 'var(--accent-emerald)', fontSize: '0.875rem', marginBottom: '1rem' }}>{message}</div>}
-        {error && <div style={{ padding: '0.75rem', borderRadius: '6px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1rem' }}>{error}</div>}
+      <div className="card">
+        {message && <div className="alert-banner alert-success"><span>{message}</span></div>}
+        {error && <div className="alert-banner alert-danger"><span>{error}</span></div>}
 
         {/* Messaging Code Card */}
         <div style={{
-          backgroundColor: 'var(--panel-bg)',
-          border: '1px solid var(--border-color)',
-          borderRadius: '8px',
-          padding: '1.25rem',
-          marginBottom: '1.5rem',
+          backgroundColor: 'var(--bg-subtle)',
+          border: '1px solid var(--border-default)',
+          borderRadius: 'var(--radius-md)',
+          padding: '0.875rem 1rem',
+          marginBottom: '1.25rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
           <div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-              Your Direct Messaging Code
+            <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+              Direct Messaging Code
             </div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '2px', color: 'var(--primary-color)', marginTop: '0.25rem' }}>
+            <div style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '1.5px', color: 'var(--primary-navy)', marginTop: '0.15rem' }}>
               {user.messaging_code}
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginTop: '0.25rem' }}>
-              Classmates enter this code to request a private chat with you.
+            <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+              Classmates enter this code to request a private direct chat.
             </div>
           </div>
-          <button type="button" onClick={copyCode} className="btn btn-secondary btn-sm">
-            {copied ? 'Copied! ✓' : 'Copy Code'}
+          <button type="button" onClick={copyCode} className="btn btn-secondary btn-xs">
+            {copied ? 'Copied' : 'Copy Code'}
           </button>
         </div>
 
         <form onSubmit={handleSave}>
           {/* Avatar Upload Dropzone & Circle Preview */}
-          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-            <label>Profile Avatar Photo</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginTop: '0.5rem' }}>
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
+            <label htmlFor="avatarFileInput">Upload Profile Photo</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.35rem' }}>
               {avatarUrl ? (
                 <img
                   src={avatarUrl}
                   alt={fullName}
-                  style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary-color)' }}
+                  style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border-strong)' }}
                 />
               ) : (
-                <div style={{ width: '72px', height: '72px', borderRadius: '50%', backgroundColor: 'var(--primary-color)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.75rem' }}>
+                <div className="avatar-circle" style={{ width: '56px', height: '56px', fontSize: '1.25rem' }}>
                   {fullName ? fullName.charAt(0).toUpperCase() : 'U'}
                 </div>
               )}
 
-              <div className="file-upload-box" style={{ flex: 1, padding: '1rem' }}>
-                <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--primary-color)' }}>
-                  📁 Choose Image File
+              <div className="file-upload-box" style={{ flex: 1, padding: '0.75rem' }}>
+                <div style={{ fontWeight: 600, fontSize: '0.78125rem', color: 'var(--primary-navy)' }}>
+                  Choose Image File
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                  Click or drag photo here (PNG, JPG, WEBP)
+                <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  PNG, JPG, WEBP
                 </div>
-                <input type="file" accept="image/*" onChange={handleAvatarFileSelect} />
+                <input id="avatarFileInput" type="file" accept="image/*" onChange={handleAvatarFileSelect} />
               </div>
             </div>
           </div>
 
           <div className="form-group">
-            <label>University Email</label>
-            <input type="text" value={user.email} disabled style={{ backgroundColor: 'var(--panel-bg)', cursor: 'not-allowed' }} />
+            <label htmlFor="userEmail">University Email</label>
+            <input id="userEmail" type="text" value={user.email} disabled style={{ backgroundColor: 'var(--bg-subtle)', cursor: 'not-allowed', color: 'var(--text-muted)' }} />
           </div>
 
           <div className="form-group">
-            <label>Full Name</label>
+            <label htmlFor="userFullName">Full Name</label>
             <input
+              id="userFullName"
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -161,16 +162,17 @@ export default function AccountPage() {
           </div>
 
           <div className="form-group">
-            <label>Bio / Academic Interests</label>
+            <label htmlFor="userBio">Bio / Study Interests</label>
             <textarea
+              id="userBio"
               rows={3}
-              placeholder="Tell your classmates about your major, interests, or courses..."
+              placeholder="Tell your classmates about your major, interests, or current courses..."
               value={bio}
               onChange={(e) => setBio(e.target.value)}
             />
           </div>
 
-          <button type="submit" className="btn btn-primary" disabled={saving}>
+          <button type="submit" className="btn btn-navy btn-sm" style={{ marginTop: '0.25rem' }} disabled={saving}>
             {saving ? 'Saving...' : 'Save Profile Changes'}
           </button>
         </form>

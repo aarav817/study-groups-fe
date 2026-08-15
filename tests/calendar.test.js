@@ -1,10 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import CalendarPage from '../src/app/calendar/page';
 
 jest.mock('../src/lib/api', () => ({
   api: {
     events: {
-      listUpcoming: jest.fn().mockResolvedValue({
+      getMyEvents: jest.fn().mockResolvedValue({
         success: true,
         data: {
           events: [
@@ -35,8 +35,12 @@ describe('Study Calendar Page (Jest + React Testing Library)', () => {
     render(<CalendarPage />);
 
     expect(screen.getByText(/study sessions calendar/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /\+ schedule session/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /← previous/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /next →/i })).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /\+ schedule session/i })).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole('button', { name: /previous/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
   });
 });

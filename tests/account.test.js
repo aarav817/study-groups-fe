@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import AccountPage from '../src/app/account/page';
 
-jest.mock('../src/app/layout', () => ({
+jest.mock('../src/lib/AuthContext', () => ({
   useAuth: () => ({
     user: {
       full_name: 'Alex Morgan',
@@ -17,7 +17,7 @@ jest.mock('../src/app/layout', () => ({
 jest.mock('../src/lib/api', () => ({
   api: {
     users: {
-      getMe: jest.fn().mockResolvedValue({
+      getProfile: jest.fn().mockResolvedValue({
         success: true,
         data: {
           user: {
@@ -29,7 +29,7 @@ jest.mock('../src/lib/api', () => ({
           },
         },
       }),
-      updateMe: jest.fn(),
+      updateProfile: jest.fn(),
     },
   },
 }));

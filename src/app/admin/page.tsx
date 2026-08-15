@@ -115,94 +115,93 @@ export default function AdminPage() {
   }, [autoRefresh]);
 
   if (loading && !metrics) {
-    return <div style={{ textAlign: 'center', padding: '3rem' }}>Loading operational telemetry...</div>;
+    return <div style={{ padding: '2rem 0', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Loading operational telemetry...</div>;
   }
 
   if (accessDenied) {
     return (
-      <div style={{ maxWidth: '500px', margin: '4rem auto', padding: '2rem', textAlign: 'center', border: '1px solid var(--border-color)', borderRadius: '12px', backgroundColor: 'var(--card-bg)' }}>
-        <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🔒</div>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--accent-rose)', marginBottom: '0.5rem' }}>403 Access Denied</h2>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-          You do not have administrative privileges to view operational system metrics.
+      <div className="card" style={{ maxWidth: '440px', margin: '3rem auto', textAlign: 'center', padding: '2rem' }}>
+        <span className="badge badge-rose" style={{ marginBottom: '0.75rem' }}>403 Forbidden</span>
+        <h2 className="modal-title" style={{ fontSize: '1.25rem', marginBottom: '0.35rem' }}>Access Denied</h2>
+        <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+          Administrative privileges are required to view system telemetry and traffic metrics.
         </p>
       </div>
     );
   }
 
-  const statusColor = metrics?.system_status === 'HEALTHY' ? 'var(--accent-emerald)' : metrics?.system_status === 'DEGRADED' ? 'var(--accent-amber)' : 'var(--accent-rose)';
-  const statusBg = metrics?.system_status === 'HEALTHY' ? 'var(--accent-emerald-bg)' : metrics?.system_status === 'DEGRADED' ? 'var(--accent-amber-bg)' : 'var(--accent-rose-bg)';
+  const statusBadgeClass = metrics?.system_status === 'HEALTHY' ? 'badge-emerald' : metrics?.system_status === 'DEGRADED' ? 'badge-amber' : 'badge-rose';
 
   return (
-    <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '980px', margin: '0 auto' }}>
       {/* Header Banner */}
-      <div className="page-header" style={{ marginBottom: '1.5rem', alignItems: 'flex-start' }}>
+      <div className="page-header" style={{ marginBottom: '1rem', alignItems: 'flex-start' }}>
         <div>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <span className="badge" style={{ backgroundColor: statusBg, color: statusColor, fontSize: '0.85rem', padding: '4px 12px', border: `1px solid ${statusColor}` }}>
-              SYSTEM STATUS: {metrics?.system_status || 'UNKNOWN'}
+          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', marginBottom: '0.35rem' }}>
+            <span className={`badge ${statusBadgeClass}`}>
+              STATUS: {metrics?.system_status || 'UNKNOWN'}
             </span>
-            <span className="badge" style={{ backgroundColor: 'var(--accent-purple-bg)', color: 'var(--accent-purple)', fontSize: '0.8rem', padding: '4px 10px' }}>
-              ⏱ Rolling 1-Minute Window (Resets every 60s)
+            <span className="badge badge-navy">
+              Rolling 60s Window
             </span>
           </div>
 
-          <h1 className="page-title" style={{ margin: '0.25rem 0' }}>Operational Telemetry Metrics</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-            Live backend telemetry • Window started: {metrics?.window_start_time ? new Date(metrics.window_start_time).toLocaleTimeString() : 'N/A'} • Refreshed: {metrics?.timestamp ? new Date(metrics.timestamp).toLocaleTimeString() : 'N/A'}
+          <h1 className="page-title">Operational Telemetry</h1>
+          <p className="page-subtitle">
+            Live backend telemetry • Window started: {metrics?.window_start_time ? new Date(metrics.window_start_time).toLocaleTimeString() : 'N/A'} • Last refreshed: {metrics?.timestamp ? new Date(metrics.timestamp).toLocaleTimeString() : 'N/A'}
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
+          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
             <button
               onClick={handleToggleSimulation}
-              className={`btn ${isSimulating ? 'btn-danger' : 'btn-primary'} btn-sm`}
+              className={`btn ${isSimulating ? 'btn-danger' : 'btn-navy'} btn-xs`}
             >
-              {isSimulating ? '⏹ Stop Load Traffic Simulation' : '⚡ Simulate System Load Traffic'}
+              {isSimulating ? 'Stop Load Simulation' : 'Simulate System Traffic'}
             </button>
-            <button onClick={handleResetMetricsWindow} className="btn btn-secondary btn-sm" title="Reset rolling counter window">
-              🧹 Reset Window
+            <button onClick={handleResetMetricsWindow} className="btn btn-secondary btn-xs" title="Reset window counters">
+              Reset Window
             </button>
-            <button onClick={fetchMetrics} className="btn btn-secondary btn-sm">
-              🔄 Refresh
+            <button onClick={fetchMetrics} className="btn btn-secondary btn-xs">
+              Refresh
             </button>
           </div>
 
-          <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}>
+          <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer' }}>
             <input type="checkbox" checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} />
-            Auto-refresh (3s)
+            <span>Auto-refresh (3s)</span>
           </label>
         </div>
       </div>
 
       {error && (
-        <div style={{ padding: '0.75rem', borderRadius: '6px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-          {error}
+        <div className="alert-banner alert-danger">
+          <span>{error}</span>
         </div>
       )}
 
-      {/* Pure Metric Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+      {/* Metrics Cards Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         {/* Card 1: HTTP Error Classification */}
         <div className="card">
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-            HTTP Traffic & Errors
+          <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+            HTTP Traffic
           </div>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-color)' }}>
-            {metrics?.http.total || 0} <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--text-muted)' }}>reqs</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--primary-navy)' }}>
+            {metrics?.http.total || 0} <span style={{ fontSize: '0.8125rem', fontWeight: 400, color: 'var(--text-muted)' }}>reqs</span>
           </div>
-          <div style={{ fontSize: '0.825rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div style={{ fontSize: '0.75rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>2xx Success:</span>
+              <span style={{ color: 'var(--text-secondary)' }}>2xx Success:</span>
               <strong style={{ color: 'var(--accent-emerald)' }}>{metrics?.http.status_2xx || 0}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>4xx Client Error:</span>
+              <span style={{ color: 'var(--text-secondary)' }}>4xx Client Error:</span>
               <strong style={{ color: 'var(--accent-amber)' }}>{metrics?.http.status_4xx || 0} ({metrics?.http.client_error_rate_pct || 0}%)</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>5xx Server Error:</span>
+              <span style={{ color: 'var(--text-secondary)' }}>5xx Server Error:</span>
               <strong style={{ color: 'var(--accent-rose)' }}>{metrics?.http.status_5xx || 0} ({metrics?.http.server_error_rate_pct || 0}%)</strong>
             </div>
           </div>
@@ -210,23 +209,23 @@ export default function AdminPage() {
 
         {/* Card 2: Database Query Performance */}
         <div className="card">
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-            Database Performance
+          <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+            Database Latency
           </div>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-color)' }}>
-            {metrics?.database.avg_query_time_ms || 0} <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--text-muted)' }}>ms avg</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--primary-navy)' }}>
+            {metrics?.database.avg_query_time_ms || 0} <span style={{ fontSize: '0.8125rem', fontWeight: 400, color: 'var(--text-muted)' }}>ms avg</span>
           </div>
-          <div style={{ fontSize: '0.825rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div style={{ fontSize: '0.75rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Total DB Queries:</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Total DB Queries:</span>
               <strong>{metrics?.database.total_queries || 0}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Max Query Time:</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Max Query Time:</span>
               <strong>{metrics?.database.max_query_time_ms || 0} ms</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Slow Queries (&gt;100ms):</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Slow Queries (&gt;100ms):</span>
               <strong style={{ color: (metrics?.database.slow_queries_count || 0) > 0 ? 'var(--accent-amber)' : 'var(--accent-emerald)' }}>
                 {metrics?.database.slow_queries_count || 0}
               </strong>
@@ -236,24 +235,24 @@ export default function AdminPage() {
 
         {/* Card 3: Worker Status */}
         <div className="card">
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+          <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
             Notification Worker
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 700, color: metrics?.worker.is_running ? 'var(--accent-emerald)' : 'var(--accent-rose)' }}>
-            {metrics?.worker.is_running ? '● ACTIVE' : '○ STOPPED'}
+          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: metrics?.worker.is_running ? 'var(--accent-emerald)' : 'var(--accent-rose)' }}>
+            {metrics?.worker.is_running ? 'ACTIVE' : 'STOPPED'}
           </div>
-          <div style={{ fontSize: '0.825rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div style={{ fontSize: '0.75rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Jobs Processed:</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Jobs Processed:</span>
               <strong>{metrics?.worker.total_jobs_processed || 0}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Jobs Failed:</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Jobs Failed:</span>
               <strong>{metrics?.worker.total_jobs_failed || 0}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Consecutive Errors:</span>
-              <strong style={{ color: (metrics?.worker.consecutive_failures || 0) > 0 ? 'var(--accent-rose)' : 'var(--text-color)' }}>
+              <span style={{ color: 'var(--text-secondary)' }}>Consecutive Errors:</span>
+              <strong style={{ color: (metrics?.worker.consecutive_failures || 0) > 0 ? 'var(--accent-rose)' : 'var(--text-primary)' }}>
                 {metrics?.worker.consecutive_failures || 0}
               </strong>
             </div>
@@ -262,25 +261,25 @@ export default function AdminPage() {
 
         {/* Card 4: Queues & DLQ */}
         <div className="card">
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-            Queue & Dead-Letter (DLQ)
+          <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+            Queue & DLQ Backlog
           </div>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-color)' }}>
-            {metrics?.worker.pending_queue_length || 0} <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--text-muted)' }}>pending</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--primary-navy)' }}>
+            {metrics?.worker.pending_queue_length || 0} <span style={{ fontSize: '0.8125rem', fontWeight: 400, color: 'var(--text-muted)' }}>pending</span>
           </div>
-          <div style={{ fontSize: '0.825rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div style={{ fontSize: '0.75rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Dead-Letter Queue (DLQ):</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Dead-Letter Queue:</span>
               <strong style={{ color: (metrics?.worker.dead_letter_queue_length || 0) > 0 ? 'var(--accent-rose)' : 'var(--accent-emerald)' }}>
                 {metrics?.worker.dead_letter_queue_length || 0} failed
               </strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Poll Interval:</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Poll Interval:</span>
               <strong>{metrics?.worker.poll_interval_ms || 0} ms</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Max Retries:</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Max Retries:</span>
               <strong>{metrics?.worker.max_retries || 3} attempts</strong>
             </div>
           </div>

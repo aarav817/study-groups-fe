@@ -237,8 +237,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
     }
   }, [contextMenu.visible, closeContextMenu]);
 
-  // --- Handlers ---
-
+  // Handlers
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMsg.trim()) return;
@@ -458,8 +457,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
     }
   };
 
-  // --- Admin Actions ---
-
+  // Admin Actions
   const openSettingsModal = () => {
     if (!group) return;
     setSettingsTitle(group.title);
@@ -535,7 +533,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
         loadGroupData();
       }
     } catch (err: any) {
-      console.error('Failed to kick member:', err);
+      console.error('Failed to remove member:', err);
     } finally {
       setKickingMember(false);
       setKickTarget(null);
@@ -568,11 +566,11 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
   };
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '3rem' }}>Loading group workspace...</div>;
+    return <div style={{ padding: '2rem 0', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Loading group workspace...</div>;
   }
 
   if (!group) {
-    return <div style={{ textAlign: 'center', padding: '3rem' }}>Study group not found or access denied.</div>;
+    return <div style={{ padding: '2rem 0', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Study group not found or access denied.</div>;
   }
 
   const activeFolderName = folders.find((f) => f.id === selectedFolderId)?.name;
@@ -582,88 +580,107 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
 
   return (
     <div>
-      {/* Header Card */}
-      <div className="card" style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      {/* Workspace Header Card */}
+      <div className="card" style={{ marginBottom: '1rem', padding: '1rem 1.25rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
           <div>
-            <span className={`badge ${group.is_public ? 'badge-purple' : 'badge-amber'}`} style={{ marginBottom: '0.5rem' }}>
-              {group.is_public ? '🌐 Public Group' : '🔒 Private Group'}
-            </span>
-            <h1 className="page-title" style={{ margin: '0.25rem 0' }}>{group.title}</h1>
-            {group.description && <p style={{ color: 'var(--text-muted)' }}>{group.description}</p>}
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
+              <span className={`badge ${group.is_public ? 'badge-blue' : 'badge-navy'}`}>
+                {group.is_public ? 'Public' : 'Private'}
+              </span>
+              {myRole && (
+                <span className="badge badge-emerald">
+                  Role: {myRole}
+                </span>
+              )}
+            </div>
+            <h1 className="page-title" style={{ fontSize: '1.5rem', marginBottom: '0.2rem' }}>{group.title}</h1>
+            {group.description && <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', lineHeight: 1.4 }}>{group.description}</p>}
           </div>
 
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0 }}>
             {isOwnerOrAdmin && (
               <button onClick={openSettingsModal} className="btn btn-secondary btn-sm" id="group-settings-btn">
-                ⚙ Settings
+                Settings
               </button>
             )}
             <button onClick={handleGenerateInvite} className="btn btn-secondary btn-sm">
-              🔗 Generate Invite Link
+              Generate Invite Link
             </button>
           </div>
         </div>
 
         {inviteUrl && (
-          <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'var(--panel-bg)', border: '1px solid var(--border-color)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-color)' }}>Invite Link: <strong>{inviteUrl}</strong></span>
-            <button onClick={copyInvite} className="btn btn-primary btn-sm">
-              {copiedInvite ? 'Copied! ✓' : 'Copy'}
+          <div style={{ marginTop: '0.75rem', padding: '0.5rem 0.75rem', backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+            <span style={{ fontSize: '0.78125rem', color: 'var(--text-primary)', wordBreak: 'break-all' }}>Invite: <strong>{inviteUrl}</strong></span>
+            <button onClick={copyInvite} className="btn btn-navy btn-xs">
+              {copiedInvite ? 'Copied' : 'Copy'}
             </button>
           </div>
         )}
       </div>
 
-      {/* Workspace Tabs & Single Action Toolbar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button onClick={() => setActiveTab('chat')} className={`btn ${activeTab === 'chat' ? 'btn-primary' : 'btn-secondary'}`}>
-            💬 Group Chat ({conversations.length} Topics)
+      {/* Segmented Control Workspace Tabs & Toolbar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div className="segmented-control">
+          <button
+            onClick={() => setActiveTab('chat')}
+            className={`segmented-item ${activeTab === 'chat' ? 'active' : ''}`}
+          >
+            Chat ({conversations.length} Topics)
           </button>
-          <button onClick={() => setActiveTab('events')} className={`btn ${activeTab === 'events' ? 'btn-primary' : 'btn-secondary'}`}>
-            📅 Events ({events.length})
+          <button
+            onClick={() => setActiveTab('events')}
+            className={`segmented-item ${activeTab === 'events' ? 'active' : ''}`}
+          >
+            Events ({events.length})
           </button>
-          <button onClick={() => setActiveTab('materials')} className={`btn ${activeTab === 'materials' ? 'btn-primary' : 'btn-secondary'}`}>
-            📁 Materials ({materials.length})
+          <button
+            onClick={() => setActiveTab('materials')}
+            className={`segmented-item ${activeTab === 'materials' ? 'active' : ''}`}
+          >
+            Materials ({materials.length})
           </button>
-          <button onClick={() => setActiveTab('members')} className={`btn ${activeTab === 'members' ? 'btn-primary' : 'btn-secondary'}`}>
-            👥 Members ({members.length})
+          <button
+            onClick={() => setActiveTab('members')}
+            className={`segmented-item ${activeTab === 'members' ? 'active' : ''}`}
+          >
+            Members ({members.length})
           </button>
         </div>
 
         {/* Action Buttons Toolbar */}
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.4rem' }}>
           {activeTab === 'chat' && (
-            <button onClick={() => setShowTopicModal(true)} className="btn btn-primary btn-sm">
+            <button onClick={() => setShowTopicModal(true)} className="btn btn-navy btn-sm">
               + New Topic
             </button>
           )}
           {activeTab === 'events' && (
-            <button onClick={() => setShowEventModal(true)} className="btn btn-primary btn-sm">
+            <button onClick={() => setShowEventModal(true)} className="btn btn-navy btn-sm">
               + Schedule Event
             </button>
           )}
           {activeTab === 'materials' && (
             <>
               <button onClick={() => setShowFolderModal(true)} className="btn btn-secondary btn-sm">
-                📁 + Create Folder
+                + New Folder
               </button>
-              <button onClick={() => setShowMaterialModal(true)} className="btn btn-primary btn-sm">
-                + Upload Material
+              <button onClick={() => setShowMaterialModal(true)} className="btn btn-navy btn-sm">
+                + Upload File
               </button>
             </>
           )}
         </div>
       </div>
 
-      {/* Tab Content */}
-      <div className="card">
-        {/* MULTI-CONVERSATION GROUP CHAT STREAM */}
+      {/* Main Workspace Content Card */}
+      <div className="card" style={{ padding: '1rem' }}>
+        {/* GROUP CHAT STREAM */}
         {activeTab === 'chat' && (
-          <div style={{ display: 'flex', flexDirection: 'column', height: '480px' }}>
-            {/* Scrollable Conversation Topic Tabs */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.75rem', marginBottom: '0.75rem', borderBottom: '1px solid var(--border-subtle)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '440px' }}>
+            {/* Topic Pills */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', overflowX: 'auto', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid var(--border-subtle)' }}>
               {conversations.map((conv) => {
                 const isActive = conv.id === activeConvId;
                 const isGeneral = conv.title === 'General';
@@ -672,13 +689,13 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                     key={conv.id}
                     onClick={() => switchConversation(conv.id)}
                     style={{
-                      padding: '0.35rem 0.75rem',
-                      borderRadius: '16px',
-                      fontSize: '0.8rem',
-                      fontWeight: isActive ? 600 : 400,
-                      backgroundColor: isActive ? 'var(--primary-light)' : 'var(--panel-bg)',
-                      color: isActive ? 'var(--primary-color)' : 'var(--text-color)',
-                      border: `1px solid ${isActive ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                      padding: '0.25rem 0.6rem',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.75rem',
+                      fontWeight: isActive ? 600 : 500,
+                      backgroundColor: isActive ? 'var(--primary-subtle)' : 'var(--bg-subtle)',
+                      color: isActive ? 'var(--primary-color)' : 'var(--text-secondary)',
+                      border: `1px solid ${isActive ? 'var(--primary-light)' : 'var(--border-default)'}`,
                       cursor: 'pointer',
                       whiteSpace: 'nowrap',
                       display: 'flex',
@@ -687,7 +704,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                       flexShrink: 0,
                     }}
                   >
-                    <span>💬 {conv.title}</span>
+                    <span>#{conv.title}</span>
                     {isOwnerOrAdmin && !isGeneral && (
                       <button
                         onClick={(e) => {
@@ -697,7 +714,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent-rose)', fontSize: '0.75rem', padding: '0 2px' }}
                         title="Delete topic"
                       >
-                        ✕
+                        x
                       </button>
                     )}
                   </div>
@@ -706,67 +723,74 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
 
               <button
                 onClick={() => setShowTopicModal(true)}
-                style={{ padding: '0.35rem 0.65rem', borderRadius: '16px', fontSize: '0.8rem', backgroundColor: 'var(--panel-bg)', border: '1px dashed var(--primary-color)', color: 'var(--primary-color)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+                style={{ padding: '0.25rem 0.55rem', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem', backgroundColor: 'transparent', border: '1px dashed var(--border-strong)', color: 'var(--text-muted)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
               >
                 + Topic
               </button>
             </div>
 
-            {/* Chat Stream */}
-            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '0.75rem', paddingRight: '0.5rem' }}>
+            {/* Chat Messages */}
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.3rem', marginBottom: '0.5rem', paddingRight: '0.25rem' }}>
               {messages.length === 0 ? (
-                <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', margin: 'auto' }}>
-                  No messages in this topic yet. Start the conversation!
+                <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8125rem', margin: 'auto' }}>
+                  No messages in this topic yet.
                 </div>
               ) : (
                 messages.map((m) => (
-                  <div key={m.id} style={{ padding: '0.35rem 0.65rem', backgroundColor: 'var(--panel-bg)', borderRadius: '6px', border: '1px solid var(--border-subtle)', display: 'flex', gap: '0.5rem', alignItems: 'baseline' }}>
-                    <span style={{ fontWeight: 600, fontSize: '0.8rem', color: 'var(--primary-color)', flexShrink: 0 }}>{m.sender_name || 'Member'}:</span>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-color)' }}>{m.content}</span>
+                  <div key={m.id} style={{ padding: '0.35rem 0.6rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', display: 'flex', gap: '0.5rem', alignItems: 'baseline' }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.78125rem', color: 'var(--primary-navy)', flexShrink: 0 }}>
+                      {m.sender_name || 'Member'}:
+                    </span>
+                    <span style={{ fontSize: '0.8125rem', color: 'var(--text-primary)' }}>{m.content}</span>
                   </div>
                 ))
               )}
             </div>
 
-            <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '0.5rem' }}>
+            <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '0.4rem' }}>
               <input
                 type="text"
                 className="form-control"
-                placeholder={`Post to #${conversations.find((c) => c.id === activeConvId)?.title || 'chat'}...`}
+                placeholder={`Post to #${conversations.find((c) => c.id === activeConvId)?.title || 'general'}...`}
                 value={newMsg}
                 onChange={(e) => setNewMsg(e.target.value)}
-                style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
+                style={{ padding: '0.4rem 0.65rem', fontSize: '0.8125rem' }}
               />
-              <button type="submit" className="btn btn-primary btn-sm">
+              <button type="submit" className="btn btn-navy btn-sm">
                 Send
               </button>
             </form>
           </div>
         )}
 
+        {/* MEMBERS TAB */}
         {activeTab === 'members' && (
           <div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Group Members ({members.length})</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+              Enrolled Members ({members.length})
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
               {members.map((m) => (
                 <div
                   key={m.id}
                   onContextMenu={(e) => handleMemberContextMenu(e, m)}
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0.875rem', backgroundColor: 'var(--panel-bg)', borderRadius: '6px', border: '1px solid var(--border-color)', cursor: isOwner && m.user_id !== user?.id && m.role !== 'owner' ? 'context-menu' : 'default' }}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0.75rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)', cursor: isOwner && m.user_id !== user?.id && m.role !== 'owner' ? 'context-menu' : 'default' }}
                 >
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{m.full_name}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{m.email}</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--primary-navy)' }}>{m.full_name}</div>
+                    <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>{m.email}</div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span className={`badge ${m.role === 'owner' ? 'badge-purple' : m.role === 'admin' ? 'badge-amber' : 'badge-emerald'}`}>{m.role.toUpperCase()}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span className={`badge ${m.role === 'owner' ? 'badge-navy' : m.role === 'admin' ? 'badge-amber' : 'badge-blue'}`}>
+                      {m.role}
+                    </span>
                     {canKick(m) && (
                       <button
                         onClick={() => setKickTarget(m)}
                         className="icon-btn danger"
                         title="Remove member"
                       >
-                        ✕
+                        x
                       </button>
                     )}
                   </div>
@@ -774,41 +798,44 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
               ))}
             </div>
             {isOwner && (
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginTop: '0.75rem' }}>
-                💡 Right-click a member to promote or demote them.
+              <p style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '0.625rem' }}>
+                Right-click a member to change permissions between admin and member.
               </p>
             )}
           </div>
         )}
 
+        {/* EVENTS TAB */}
         {activeTab === 'events' && (
           <div>
-            <div style={{ marginBottom: '1rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>Upcoming Events & Study Sessions</h3>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+              Scheduled Study Sessions
             </div>
 
             {events.length === 0 ? (
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>No events scheduled yet for this group. Use the button above to schedule one!</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', padding: '1rem 0' }}>
+                No events scheduled yet. Click &quot;+ Schedule Event&quot; above to set a meeting.
+              </p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {events.map((e) => (
-                  <div key={e.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', backgroundColor: 'var(--panel-bg)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                  <div key={e.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.65rem 0.85rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)' }}>
                     <div>
-                      <h4 style={{ fontWeight: 600, fontSize: '1rem' }}>{e.title}</h4>
-                      {e.description && <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.2rem 0' }}>{e.description}</p>}
-                      <div style={{ display: 'flex', gap: '1rem', fontSize: '0.775rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-                        <span>📅 {new Date(e.start_time).toLocaleString()}</span>
-                        {e.location && <span>📍 {e.location}</span>}
-                        <span>👥 {e.attendee_count || 1} Attending</span>
+                      <h4 style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--primary-navy)' }}>{e.title}</h4>
+                      {e.description && <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '0.15rem 0' }}>{e.description}</p>}
+                      <div style={{ display: 'flex', gap: '0.85rem', fontSize: '0.71875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                        <span>Time: {new Date(e.start_time).toLocaleString()}</span>
+                        {e.location && <span>Location: {e.location}</span>}
+                        <span>{e.attendee_count || 1} Attending</span>
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                       <button
                         onClick={() => handleRsvp(e.id)}
-                        className={`btn ${e.is_attending ? 'btn-secondary' : 'btn-primary'} btn-sm`}
+                        className={`btn ${e.is_attending ? 'btn-secondary' : 'btn-navy'} btn-xs`}
                       >
-                        {e.is_attending ? '✓ Attending' : 'RSVP'}
+                        {e.is_attending ? 'Attending' : 'RSVP'}
                       </button>
 
                       {(isOwnerOrAdmin || e.created_by === user?.id) && (
@@ -817,7 +844,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                           className="icon-btn danger"
                           title="Delete event"
                         >
-                          🗑
+                          x
                         </button>
                       )}
                     </div>
@@ -828,39 +855,39 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
           </div>
         )}
 
-        {/* INTERACTIVE FOLDER DIRECTORY HIERARCHY */}
+        {/* MATERIALS TAB */}
         {activeTab === 'materials' && (
           <div>
-            {/* Folder Crumb Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {/* Folder Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <button
                   onClick={() => setSelectedFolderId(null)}
-                  className={`btn ${selectedFolderId === null ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                  className={`btn ${selectedFolderId === null ? 'btn-navy' : 'btn-secondary'} btn-xs`}
                 >
-                  📁 All Files ({materials.length})
+                  All Files ({materials.length})
                 </button>
                 {selectedFolderId && (
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-                    / 📁 {activeFolderName}
+                  <span style={{ fontSize: '0.78125rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                    / {activeFolderName}
                   </span>
                 )}
               </div>
 
               {selectedFolderId && (
-                <button onClick={() => setSelectedFolderId(null)} className="btn btn-secondary btn-sm">
-                  &larr; Back to All Folders
+                <button onClick={() => setSelectedFolderId(null)} className="btn btn-secondary btn-xs">
+                  Back to All Folders
                 </button>
               )}
             </div>
 
             {/* Folder Directory Grid */}
             {!selectedFolderId && folders.length > 0 && (
-              <div style={{ marginBottom: '1.5rem' }}>
-                <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+              <div style={{ marginBottom: '1rem' }}>
+                <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
                   Folders ({folders.length})
-                </h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.875rem' }}>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.5rem' }}>
                   {folders.map((folder) => {
                     const count = materials.filter((m) => m.folder_id === folder.id).length;
 
@@ -869,23 +896,21 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                         key={folder.id}
                         onClick={() => setSelectedFolderId(folder.id)}
                         style={{
-                          padding: '0.875rem 1rem',
-                          backgroundColor: 'var(--panel-bg)',
-                          border: '1px solid var(--border-color)',
-                          borderRadius: '8px',
+                          padding: '0.5rem 0.75rem',
+                          backgroundColor: 'var(--bg-subtle)',
+                          border: '1px solid var(--border-default)',
+                          borderRadius: 'var(--radius-md)',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '0.75rem',
-                          transition: 'all 0.15s ease',
+                          gap: '0.5rem',
+                          transition: 'all 0.12s ease',
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--primary-color)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border-color)')}
                       >
-                        <div style={{ fontSize: '1.5rem' }}>📁</div>
+                        <span className="badge badge-navy" style={{ fontSize: '0.625rem' }}>DIR</span>
                         <div>
-                          <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-color)' }}>{folder.name}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{count} {count === 1 ? 'file' : 'files'}</div>
+                          <div style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--primary-navy)' }}>{folder.name}</div>
+                          <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>{count} {count === 1 ? 'file' : 'files'}</div>
                         </div>
                       </div>
                     );
@@ -894,26 +919,28 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
               </div>
             )}
 
-            {/* Material Items List */}
-            <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
-              {selectedFolderId ? `Files in "${activeFolderName}" (${filteredMaterials.length})` : `All Group Files (${materials.length})`}
-            </h4>
+            {/* Files List */}
+            <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+              {selectedFolderId ? `Files in ${activeFolderName} (${filteredMaterials.length})` : `All Materials (${materials.length})`}
+            </div>
 
             {filteredMaterials.length === 0 ? (
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                {selectedFolderId ? 'No materials in this folder yet. Use "+ Upload Material" above to add files!' : 'No materials uploaded in this group yet.'}
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', padding: '0.5rem 0' }}>
+                {selectedFolderId ? 'No materials in this folder yet.' : 'No materials uploaded in this group yet.'}
               </p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 {filteredMaterials.map((m) => (
-                  <div key={m.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.625rem 0.875rem', backgroundColor: 'var(--panel-bg)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                  <div key={m.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.45rem 0.75rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-default)' }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{m.title}</div>
-                      <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{m.file_format.toUpperCase()} • Uploaded by {m.uploader_name || 'Member'}</small>
+                      <div style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--primary-navy)' }}>{m.title}</div>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.6875rem' }}>
+                        {m.file_format.toUpperCase()} • Uploaded by {m.uploader_name || 'Member'}
+                      </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <a href={m.file_url} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm">
-                        View Material &rarr;
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <a href={m.file_url} target="_blank" rel="noreferrer" className="btn btn-secondary btn-xs">
+                        View File &rarr;
                       </a>
                       {isOwnerOrAdmin && (
                         <button
@@ -921,7 +948,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                           className="icon-btn danger"
                           title="Delete material"
                         >
-                          🗑
+                          x
                         </button>
                       )}
                     </div>
@@ -933,25 +960,25 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
         )}
       </div>
 
-      {/* Context Menu (right-click on member) */}
+      {/* Context Menu (right-click member) */}
       {contextMenu.visible && contextMenu.member && (
         <div
           ref={contextMenuRef}
           className="context-menu"
           style={{ left: contextMenu.x, top: contextMenu.y }}
         >
-          <div style={{ padding: '0.375rem 0.875rem', fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-light)', textTransform: 'uppercase' }}>
+          <div style={{ padding: '0.3rem 0.65rem', fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
             {contextMenu.member.full_name}
           </div>
           <div className="context-menu-divider" />
 
           {contextMenu.member.role === 'member' ? (
             <button className="context-menu-item" onClick={() => handleRoleChange(contextMenu.member!, 'admin')}>
-              ⬆️ Promote to Admin
+              Promote to Admin
             </button>
           ) : contextMenu.member.role === 'admin' ? (
             <button className="context-menu-item" onClick={() => handleRoleChange(contextMenu.member!, 'member')}>
-              ⬇️ Demote to Member
+              Demote to Member
             </button>
           ) : null}
 
@@ -963,22 +990,22 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
               closeContextMenu();
             }}
           >
-            ✕ Remove from Group
+            Remove from Group
           </button>
         </div>
       )}
 
-      {/* Kick Member Confirmation */}
+      {/* Kick Member Confirm Modal */}
       {kickTarget && (
         <div className="confirm-overlay" onClick={() => !kickingMember && setKickTarget(null)}>
           <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
             <h3>Remove Member</h3>
             <p>
-              Are you sure you want to remove <strong>{kickTarget.full_name}</strong> ({kickTarget.email}) from this group? They can rejoin later via invite.
+              Are you sure you want to remove <strong>{kickTarget.full_name}</strong> from this study group?
             </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-              <button className="btn btn-secondary" onClick={() => setKickTarget(null)} disabled={kickingMember}>Cancel</button>
-              <button className="btn btn-danger" onClick={handleKickMember} disabled={kickingMember}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+              <button className="btn btn-secondary btn-sm" onClick={() => setKickTarget(null)} disabled={kickingMember}>Cancel</button>
+              <button className="btn btn-danger btn-sm" onClick={handleKickMember} disabled={kickingMember}>
                 {kickingMember ? 'Removing...' : 'Remove Member'}
               </button>
             </div>
@@ -989,72 +1016,70 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
       {/* Group Settings Modal */}
       {showSettingsModal && (
         <div className="modal-overlay" onClick={() => setShowSettingsModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.25rem' }}>Group Settings</h2>
-            <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
-              {isOwner ? 'Manage group details, visibility, and danger zone.' : 'Edit group name and description.'}
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">Group Settings</h2>
+            <p className="modal-subtitle">
+              {isOwner ? 'Manage group title, visibility, and deletion.' : 'Edit group title and description.'}
             </p>
 
-            {settingsError && <div style={{ padding: '0.75rem', borderRadius: '6px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1rem' }}>{settingsError}</div>}
+            {settingsError && (
+              <div className="alert-banner alert-danger">
+                <span>{settingsError}</span>
+              </div>
+            )}
 
             <form onSubmit={handleSaveSettings}>
-              {/* General Settings */}
               <div className="settings-section">
                 <div className="settings-section-title">General</div>
                 <div className="form-group">
-                  <label>Group Name</label>
-                  <input type="text" className="form-control" value={settingsTitle} onChange={(e) => setSettingsTitle(e.target.value)} required />
+                  <label>Group Title</label>
+                  <input type="text" value={settingsTitle} onChange={(e) => setSettingsTitle(e.target.value)} required />
                 </div>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label>Description</label>
-                  <textarea rows={3} className="form-control" value={settingsDesc} onChange={(e) => setSettingsDesc(e.target.value)} placeholder="Describe this study group..." />
+                  <textarea rows={2} value={settingsDesc} onChange={(e) => setSettingsDesc(e.target.value)} />
                 </div>
               </div>
 
-              {/* Visibility */}
               <div className="settings-section">
                 <div className="settings-section-title">Visibility</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button
                     type="button"
                     onClick={() => setSettingsPublic(true)}
-                    className={`btn ${settingsPublic ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                    className={`btn ${settingsPublic ? 'btn-navy' : 'btn-secondary'} btn-xs`}
                   >
-                    🌐 Public
+                    Public
                   </button>
                   <button
                     type="button"
                     onClick={() => setSettingsPublic(false)}
-                    className={`btn ${!settingsPublic ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                    className={`btn ${!settingsPublic ? 'btn-navy' : 'btn-secondary'} btn-xs`}
                   >
-                    🔒 Private
+                    Private
                   </button>
-                  <span style={{ fontSize: '0.775rem', color: 'var(--text-muted)' }}>
-                    {settingsPublic ? 'Anyone can discover and join this group.' : 'Only members with an invite link can join.'}
-                  </span>
                 </div>
               </div>
 
-              {/* Danger Zone - Owner Only */}
               {isOwner && (
                 <div className="settings-section">
-                  <div className="settings-section-title" style={{ color: 'var(--accent-rose)' }}>⚠ Danger Zone</div>
-                  <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-                    Permanently delete this group and all associated data (messages, events, materials, memberships). This action cannot be undone.
+                  <div className="settings-section-title" style={{ color: 'var(--accent-rose)' }}>Danger Zone</div>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                    Permanently delete this group and all its files, events, and chats.
                   </p>
                   <button
                     type="button"
-                    className="btn btn-danger-outline btn-sm"
+                    className="btn btn-danger-outline btn-xs"
                     onClick={() => setShowDeleteConfirm(true)}
                   >
-                    🗑 Delete Group Permanently
+                    Delete Group Permanently
                   </button>
                 </div>
               )}
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowSettingsModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={savingSettings}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowSettingsModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-navy btn-sm" disabled={savingSettings}>
                   {savingSettings ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
@@ -1067,23 +1092,23 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
       {showTopicModal && (
         <div className="modal-overlay" onClick={() => setShowTopicModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Start New Chat Topic</h2>
-            {topicError && <div style={{ padding: '0.75rem', borderRadius: '6px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1rem' }}>{topicError}</div>}
+            <h2 className="modal-title">New Chat Topic</h2>
+            <p className="modal-subtitle">Start a channel for specific homework, exams, or labs.</p>
+            {topicError && <div className="alert-banner alert-danger"><span>{topicError}</span></div>}
             <form onSubmit={handleCreateTopic}>
               <div className="form-group">
                 <label>Topic Title</label>
                 <input
                   type="text"
-                  className="form-control"
-                  placeholder="e.g. Homework Help, Midterm Review, Office Hours"
+                  placeholder="e.g. Midterm 1 Prep, Problem Set 3"
                   value={topicTitle}
                   onChange={(e) => setTopicTitle(e.target.value)}
                   required
                 />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowTopicModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={creatingTopic}>{creatingTopic ? 'Creating...' : 'Create Topic'}</button>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowTopicModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-navy btn-sm" disabled={creatingTopic}>{creatingTopic ? 'Creating...' : 'Create Topic'}</button>
               </div>
             </form>
           </div>
@@ -1094,14 +1119,14 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
       {showDeleteConfirm && (
         <div className="confirm-overlay" onClick={() => !deletingGroup && setShowDeleteConfirm(false)}>
           <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
-            <h3>🗑 Delete &quot;{group.title}&quot;?</h3>
+            <h3>Delete Group</h3>
             <p>
-              This will permanently delete the group and all its data including messages, events, materials, and memberships. This action <strong>cannot be undone</strong>.
+              Permanently delete <strong>{group.title}</strong>? This action cannot be reversed.
             </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-              <button className="btn btn-secondary" onClick={() => setShowDeleteConfirm(false)} disabled={deletingGroup}>Cancel</button>
-              <button className="btn btn-danger" onClick={handleDeleteGroup} disabled={deletingGroup}>
-                {deletingGroup ? 'Deleting...' : 'Yes, Delete Group'}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+              <button className="btn btn-secondary btn-sm" onClick={() => setShowDeleteConfirm(false)} disabled={deletingGroup}>Cancel</button>
+              <button className="btn btn-danger btn-sm" onClick={handleDeleteGroup} disabled={deletingGroup}>
+                {deletingGroup ? 'Deleting...' : 'Delete Group'}
               </button>
             </div>
           </div>
@@ -1112,28 +1137,28 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
       {showEventModal && (
         <div className="modal-overlay" onClick={() => setShowEventModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Schedule Study Event</h2>
-            {eventError && <div style={{ padding: '0.75rem', borderRadius: '6px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1rem' }}>{eventError}</div>}
+            <h2 className="modal-title">Schedule Study Session</h2>
+            {eventError && <div className="alert-banner alert-danger"><span>{eventError}</span></div>}
             <form onSubmit={handleCreateEvent}>
               <div className="form-group">
-                <label>Event Title</label>
-                <input type="text" className="form-control" placeholder="e.g. Midterm Review Session" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
+                <label>Session Title</label>
+                <input type="text" placeholder="e.g. Weekly Problem Set Working Group" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
               </div>
               <div className="form-group">
                 <label>Description</label>
-                <textarea rows={2} className="form-control" placeholder="Topics covered, problem sets..." value={eventDesc} onChange={(e) => setEventDesc(e.target.value)} />
+                <textarea rows={2} placeholder="Topics covered, room number, or links..." value={eventDesc} onChange={(e) => setEventDesc(e.target.value)} />
               </div>
               <div className="form-group">
-                <label>Location / Zoom Link</label>
-                <input type="text" className="form-control" placeholder="e.g. Library Room 204 or Zoom Link" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
+                <label>Location / Link</label>
+                <input type="text" placeholder="e.g. Science Library Room 204 or Zoom Link" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
               </div>
               <div className="form-group">
-                <label>Start Date & Time</label>
-                <input type="datetime-local" className="form-control" value={eventStartTime} onChange={(e) => setEventStartTime(e.target.value)} required />
+                <label>Date & Time</label>
+                <input type="datetime-local" value={eventStartTime} onChange={(e) => setEventStartTime(e.target.value)} required />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowEventModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={creatingEvent}>{creatingEvent ? 'Scheduling...' : 'Schedule Event'}</button>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowEventModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-navy btn-sm" disabled={creatingEvent}>{creatingEvent ? 'Scheduling...' : 'Schedule'}</button>
               </div>
             </form>
           </div>
@@ -1144,16 +1169,16 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
       {showFolderModal && (
         <div className="modal-overlay" onClick={() => setShowFolderModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Create Material Folder</h2>
-            {folderError && <div style={{ padding: '0.75rem', borderRadius: '6px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1rem' }}>{folderError}</div>}
+            <h2 className="modal-title">Create Folder</h2>
+            {folderError && <div className="alert-banner alert-danger"><span>{folderError}</span></div>}
             <form onSubmit={handleCreateFolder}>
               <div className="form-group">
                 <label>Folder Name</label>
-                <input type="text" className="form-control" placeholder="e.g. Lecture Notes, Past Exams" value={folderName} onChange={(e) => setFolderName(e.target.value)} required />
+                <input type="text" placeholder="e.g. Lecture Slides, Midterm Solutions" value={folderName} onChange={(e) => setFolderName(e.target.value)} required />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowFolderModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Create Folder</button>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowFolderModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-navy btn-sm">Create Folder</button>
               </div>
             </form>
           </div>
@@ -1164,16 +1189,17 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
       {showMaterialModal && (
         <div className="modal-overlay" onClick={() => setShowMaterialModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Upload Study Material</h2>
-            {matError && <div style={{ padding: '0.75rem', borderRadius: '6px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1rem' }}>{matError}</div>}
+            <h2 className="modal-title">Upload Study Material</h2>
+            {matError && <div className="alert-banner alert-danger"><span>{matError}</span></div>}
             <form onSubmit={handleUploadMaterial}>
-              {/* File Upload Box */}
               <div className="form-group">
-                <label>Choose File to Upload</label>
+                <label>Select File</label>
                 <div className="file-upload-box">
-                  <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>📁</div>
-                  <div style={{ fontWeight: 600, color: 'var(--primary-color)' }}>
-                    {selectedFileName ? `Selected: ${selectedFileName}` : 'Click or Drag File Here to Upload'}
+                  <div style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--primary-navy)' }}>
+                    {selectedFileName ? `Selected: ${selectedFileName}` : 'Choose File to Upload'}
+                  </div>
+                  <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    PDF, DOCX, PPTX, TXT, ZIP, Images
                   </div>
                   <input
                     type="file"
@@ -1184,23 +1210,23 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
               </div>
 
               <div className="form-group">
-                <label>Document Title</label>
-                <input type="text" className="form-control" placeholder="e.g. Lecture 5 Notes or Midterm 2 Solution Key" value={matTitle} onChange={(e) => setMatTitle(e.target.value)} required />
+                <label>Title</label>
+                <input type="text" placeholder="e.g. Lecture 4 Notes" value={matTitle} onChange={(e) => setMatTitle(e.target.value)} required />
               </div>
               {folders.length > 0 && (
                 <div className="form-group">
                   <label>Folder (Optional)</label>
-                  <select className="form-control" value={matFolderId} onChange={(e) => setMatFolderId(e.target.value)}>
-                    <option value="">No Folder (General Materials)</option>
+                  <select value={matFolderId} onChange={(e) => setMatFolderId(e.target.value)}>
+                    <option value="">No Folder (General)</option>
                     {folders.map((f) => (
                       <option key={f.id} value={f.id}>{f.name}</option>
                     ))}
                   </select>
                 </div>
               )}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowMaterialModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={uploadingMat}>{uploadingMat ? 'Uploading...' : 'Upload Material'}</button>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowMaterialModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-navy btn-sm" disabled={uploadingMat}>{uploadingMat ? 'Uploading...' : 'Upload File'}</button>
               </div>
             </form>
           </div>

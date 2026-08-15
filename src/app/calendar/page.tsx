@@ -117,10 +117,10 @@ export default function CalendarPage() {
   };
 
   const handleDateCellClick = (dayNum: number) => {
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const y = currentDate.getFullYear();
+    const m = String(currentDate.getMonth() + 1).padStart(2, '0');
     const dayStr = String(dayNum).padStart(2, '0');
-    setEventStartTime(`${year}-${month}-${dayStr}T14:00`);
+    setEventStartTime(`${y}-${m}-${dayStr}T14:00`);
     setShowEventModal(true);
   };
 
@@ -135,19 +135,16 @@ export default function CalendarPage() {
 
   const days: { dayNum: number; isCurrentMonth: boolean; fullDateStr: string }[] = [];
 
-  // Previous month trailing days
   for (let i = firstDayOfMonth - 1; i >= 0; i--) {
     days.push({ dayNum: prevMonthDays - i, isCurrentMonth: false, fullDateStr: '' });
   }
 
-  // Current month days
   for (let i = 1; i <= daysInMonth; i++) {
     const mStr = String(month + 1).padStart(2, '0');
     const dStr = String(i).padStart(2, '0');
     days.push({ dayNum: i, isCurrentMonth: true, fullDateStr: `${year}-${mStr}-${dStr}` });
   }
 
-  // Remaining days to fill grid cells
   const totalGridCells = days.length > 35 ? 42 : 35;
   const remainingCells = totalGridCells - days.length;
   for (let i = 1; i <= remainingCells; i++) {
@@ -160,7 +157,6 @@ export default function CalendarPage() {
 
   const todayStr = new Date().toISOString().split('T')[0];
 
-  // Helper to format ISO date string to YYYY-MM-DD for exact date matching
   const getFormattedDate = (isoStr: string) => {
     if (!isoStr) return '';
     try {
@@ -178,43 +174,53 @@ export default function CalendarPage() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Interactive Study Calendar</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-            View and schedule group study sessions, exam reviews, and lab hours.
+          <h1 className="page-title">Study Sessions Calendar</h1>
+          <p className="page-subtitle">
+            Scheduled group study sessions, exam reviews, and office hours across your enrolled courses.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button
-            className={`btn ${viewMode === 'grid' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setViewMode('grid')}
-          >
-            📅 Grid Calendar
-          </button>
-          <button
-            className={`btn ${viewMode === 'list' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setViewMode('list')}
-          >
-            📋 List View
-          </button>
+
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <div className="segmented-control">
+            <button
+              className={`segmented-item ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+            >
+              Month Grid
+            </button>
+            <button
+              className={`segmented-item ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+            >
+              List View
+            </button>
+          </div>
+
           {userGroups.length > 0 && (
-            <button onClick={() => setShowEventModal(true)} className="btn btn-primary">
-              + Schedule Event
+            <button onClick={() => setShowEventModal(true)} className="btn btn-navy btn-sm">
+              + Schedule Session
             </button>
           )}
         </div>
       </div>
 
       {loading ? (
-        <p>Loading study calendar...</p>
+        <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', padding: '1rem 0' }}>Loading calendar...</p>
       ) : viewMode === 'grid' ? (
-        <div className="card" style={{ padding: '1.5rem' }}>
+        <div className="card" style={{ padding: '1rem' }}>
           {/* Calendar Month Navigation Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>{monthName}</h2>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button onClick={() => changeMonth(-1)} className="btn btn-secondary btn-sm">&larr; Prev Month</button>
-              <button onClick={() => setCurrentDate(new Date())} className="btn btn-secondary btn-sm">Today</button>
-              <button onClick={() => changeMonth(1)} className="btn btn-secondary btn-sm">Next Month &rarr;</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <h2 className="card-title" style={{ margin: 0, fontSize: '1.15rem' }}>{monthName}</h2>
+            <div style={{ display: 'flex', gap: '0.35rem' }}>
+              <button onClick={() => changeMonth(-1)} className="btn btn-secondary btn-xs">
+                &larr; Previous
+              </button>
+              <button onClick={() => setCurrentDate(new Date())} className="btn btn-secondary btn-xs">
+                Today
+              </button>
+              <button onClick={() => changeMonth(1)} className="btn btn-secondary btn-xs">
+                Next &rarr;
+              </button>
             </div>
           </div>
 
@@ -225,7 +231,6 @@ export default function CalendarPage() {
             ))}
 
             {days.map((item, idx) => {
-              // STRICT DATE MATCHING: Only match events if cell is in current month and has a valid date string
               const dayEvents = (item.isCurrentMonth && item.fullDateStr)
                 ? events.filter((e) => getFormattedDate(e.start_time) === item.fullDateStr)
                 : [];
@@ -250,38 +255,38 @@ export default function CalendarPage() {
           </div>
         </div>
       ) : events.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1.5rem', maxWidth: '600px', margin: '2rem auto' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>No Upcoming Events</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '2rem' }}>
-            Events and review sessions scheduled in your study groups will appear here.
+        <div className="card" style={{ textAlign: 'center', padding: '2.5rem 1.5rem', maxWidth: '480px', margin: '1.5rem auto' }}>
+          <h2 className="card-title" style={{ fontSize: '1.1rem', marginBottom: '0.35rem' }}>No Upcoming Events</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', marginBottom: '1rem' }}>
+            Events scheduled in your enrolled study groups will appear here.
           </p>
           {userGroups.length > 0 && (
-            <button onClick={() => setShowEventModal(true)} className="btn btn-primary">
+            <button onClick={() => setShowEventModal(true)} className="btn btn-navy btn-sm">
               + Schedule New Event
             </button>
           )}
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {events.map((event) => (
             <div key={event.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <span className="badge badge-purple" style={{ marginBottom: '0.5rem' }}>
-                  {event.group_title || 'Study Group Event'}
+                <span className="badge badge-navy" style={{ marginBottom: '0.35rem' }}>
+                  {event.group_title || 'Study Group'}
                 </span>
-                <h3 className="card-title" style={{ fontSize: '1.15rem', fontWeight: 600 }}>{event.title}</h3>
-                {event.description && <p className="card-description" style={{ margin: '0.5rem 0' }}>{event.description}</p>}
-                <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                  <span>📅 {new Date(event.start_time).toLocaleString()}</span>
-                  {event.location && <span>📍 {event.location}</span>}
-                  <span>👥 {event.attendee_count || 1} Attending</span>
+                <h3 className="card-title" style={{ fontSize: '1.05rem', margin: '0.15rem 0' }}>{event.title}</h3>
+                {event.description && <p className="card-description" style={{ margin: '0.25rem 0' }}>{event.description}</p>}
+                <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+                  <span>Time: {new Date(event.start_time).toLocaleString()}</span>
+                  {event.location && <span>Location: {event.location}</span>}
+                  <span>{event.attendee_count || 1} Attending</span>
                 </div>
               </div>
               <button
                 onClick={() => handleRsvp(event.id)}
-                className={`btn ${event.is_attending ? 'btn-secondary' : 'btn-primary'} btn-sm`}
+                className={`btn ${event.is_attending ? 'btn-secondary' : 'btn-navy'} btn-xs`}
               >
-                {event.is_attending ? '✓ Attending' : 'RSVP Now'}
+                {event.is_attending ? 'Attending' : 'RSVP'}
               </button>
             </div>
           ))}
@@ -292,12 +297,13 @@ export default function CalendarPage() {
       {showEventModal && (
         <div className="modal-overlay" onClick={() => setShowEventModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Schedule Study Event</h2>
-            {eventError && <div style={{ padding: '0.75rem', borderRadius: '6px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1rem' }}>{eventError}</div>}
+            <h2 className="modal-title">Schedule Study Session</h2>
+            <p className="modal-subtitle">Add a group study meeting to the shared calendar.</p>
+            {eventError && <div className="alert-banner alert-danger"><span>{eventError}</span></div>}
             <form onSubmit={handleCreateEvent}>
               <div className="form-group">
-                <label>Select Study Group</label>
-                <select className="form-control" value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)} required>
+                <label>Study Group</label>
+                <select value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)} required>
                   {userGroups.map((g) => (
                     <option key={g.id} value={g.id}>{g.title}</option>
                   ))}
@@ -305,23 +311,23 @@ export default function CalendarPage() {
               </div>
               <div className="form-group">
                 <label>Event Title</label>
-                <input type="text" className="form-control" placeholder="e.g. Midterm 1 Practice Session" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
+                <input type="text" placeholder="e.g. Midterm 1 Working Group" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
               </div>
               <div className="form-group">
                 <label>Description</label>
-                <textarea rows={2} className="form-control" placeholder="Topics covered, problem sets..." value={eventDesc} onChange={(e) => setEventDesc(e.target.value)} />
+                <textarea rows={2} placeholder="Topics covered, room number, or problem sets..." value={eventDesc} onChange={(e) => setEventDesc(e.target.value)} />
               </div>
               <div className="form-group">
-                <label>Location / Zoom Link</label>
-                <input type="text" className="form-control" placeholder="e.g. Science Library Room 102 or Zoom Link" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
+                <label>Location / Meeting Link</label>
+                <input type="text" placeholder="e.g. Green Library 204 or Zoom Link" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} />
               </div>
               <div className="form-group">
                 <label>Start Date & Time</label>
-                <input type="datetime-local" className="form-control" value={eventStartTime} onChange={(e) => setEventStartTime(e.target.value)} required />
+                <input type="datetime-local" value={eventStartTime} onChange={(e) => setEventStartTime(e.target.value)} required />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowEventModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={creatingEvent}>{creatingEvent ? 'Scheduling...' : 'Schedule Event'}</button>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowEventModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-navy btn-sm" disabled={creatingEvent}>{creatingEvent ? 'Scheduling...' : 'Schedule Session'}</button>
               </div>
             </form>
           </div>

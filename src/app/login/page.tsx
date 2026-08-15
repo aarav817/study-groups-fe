@@ -58,10 +58,10 @@ export default function LoginPage() {
       if (res.success) {
         setResendStatus('Verification link sent! Please check your inbox.');
       } else {
-        setResendStatus(res.error?.message || 'Failed to resend email.');
+        setResendStatus(res.error?.message || 'Failed to resend verification email.');
       }
     } catch (err: any) {
-      setResendStatus(err.message || 'Failed to resend email.');
+      setResendStatus(err.message || 'Failed to resend verification email.');
     } finally {
       setResending(false);
     }
@@ -69,34 +69,40 @@ export default function LoginPage() {
 
   if (unverifiedEmail) {
     return (
-      <div className="auth-container" style={{ maxWidth: '440px' }}>
-        <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✉️</div>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.75rem' }}>
+      <div className="auth-container">
+        <div style={{ textAlign: 'center' }}>
+          <span className="badge badge-amber" style={{ marginBottom: '0.75rem' }}>
+            Action Required
+          </span>
+          <h2 className="modal-title" style={{ fontSize: '1.35rem', marginBottom: '0.5rem' }}>
             Email Verification Required
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-            Your account with <strong>{unverifiedEmail}</strong> requires email verification before signing in. Please check your inbox and click the link to activate your account.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', lineHeight: '1.5', marginBottom: '1.25rem' }}>
+            Your account with <strong>{unverifiedEmail}</strong> requires verification before signing in. Please check your email inbox for the activation link.
           </p>
 
           {resendStatus && (
-            <div style={{ padding: '0.75rem', borderRadius: '6px', background: resendStatus.includes('sent') || resendStatus.includes('resent') ? '#ecfdf5' : 'var(--accent-rose-bg)', color: resendStatus.includes('sent') || resendStatus.includes('resent') ? '#059669' : 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1rem' }}>
-              {resendStatus}
+            <div
+              className={`alert-banner ${
+                resendStatus.includes('sent') || resendStatus.includes('resent') ? 'alert-success' : 'alert-danger'
+              }`}
+            >
+              <span>{resendStatus}</span>
             </div>
           )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <button
               onClick={handleResend}
-              className="btn"
+              className="btn btn-secondary"
               disabled={resending}
-              style={{ width: '100%', background: 'var(--bg-subtle)', border: '1px solid var(--border-subtle)', cursor: 'pointer' }}
+              style={{ width: '100%' }}
             >
-              {resending ? 'Resending Email...' : 'Resend Verification Email'}
+              {resending ? 'Resending Link...' : 'Resend Verification Email'}
             </button>
             <button
               onClick={() => setUnverifiedEmail('')}
-              className="btn btn-primary"
+              className="btn btn-navy"
               style={{ width: '100%' }}
             >
               Back to Sign In
@@ -109,13 +115,24 @@ export default function LoginPage() {
 
   return (
     <div className="auth-container">
-      <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', textAlign: 'center' }}>
-        Sign In to Study Groups
+      <div className="auth-header">
+        <div className="auth-brand" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem' }}>
+          <svg style={{ width: '20px', height: '20px', color: 'var(--primary-color)', flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <span>locked in<span className="logo-period">.</span></span>
+        </div>
+        <div className="auth-tagline">A simple study platform to boost your focus.</div>
+      </div>
+
+      <h2 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--primary-navy)' }}>
+        Sign In
       </h2>
 
       {error && (
-        <div style={{ padding: '0.75rem', borderRadius: '6px', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)', fontSize: '0.875rem', marginBottom: '1rem' }}>
-          {error}
+        <div className="alert-banner alert-danger">
+          <span>{error}</span>
         </div>
       )}
 
@@ -144,15 +161,15 @@ export default function LoginPage() {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }} disabled={loading}>
+        <button type="submit" className="btn btn-navy" style={{ width: '100%', marginTop: '0.5rem' }} disabled={loading}>
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
 
-      <p style={{ marginTop: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+      <p style={{ marginTop: '1.25rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.78125rem' }}>
         Don&apos;t have an account?{' '}
         <Link href="/signup" style={{ color: 'var(--primary-color)', fontWeight: 600 }}>
-          Sign up
+          Create an account
         </Link>
       </p>
     </div>

@@ -38,34 +38,34 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
   }, [userId]);
 
   if (loading) {
-    return <div style={{ textAlign: 'center', padding: '3rem' }}>Loading user profile...</div>;
+    return <div style={{ padding: '2rem 0', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>Loading user profile...</div>;
   }
 
   if (!profile) {
-    return <div style={{ textAlign: 'center', padding: '3rem' }}>User profile not found.</div>;
+    return <div style={{ padding: '2rem 0', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>User profile not found.</div>;
   }
 
   return (
-    <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '580px', margin: '0 auto' }}>
       <div className="card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
           {profile.avatar_url ? (
             <img
               src={profile.avatar_url}
               alt={profile.full_name}
-              style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' }}
+              style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border-strong)' }}
             />
           ) : (
-            <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'var(--primary-color)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 700 }}>
+            <div className="avatar-circle" style={{ width: '56px', height: '56px', fontSize: '1.25rem' }}>
               {profile.full_name.charAt(0).toUpperCase()}
             </div>
           )}
 
           <div>
-            <h1 className="page-title">{profile.full_name}</h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{profile.email}</p>
+            <h1 className="page-title" style={{ fontSize: '1.35rem', margin: 0 }}>{profile.full_name}</h1>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>{profile.email}</p>
             {profile.messaging_code && (
-              <span className="badge badge-purple" style={{ marginTop: '0.35rem' }}>
+              <span className="badge badge-navy" style={{ marginTop: '0.25rem' }}>
                 Code: {profile.messaging_code}
               </span>
             )}
@@ -73,20 +73,24 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
         </div>
 
         {profile.bio && (
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.375rem' }}>About & Bio</h3>
-            <p style={{ color: 'var(--text-color)', lineHeight: 1.6 }}>{profile.bio}</p>
+          <div style={{ marginBottom: '1.25rem' }}>
+            <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+              About
+            </div>
+            <p style={{ color: 'var(--text-primary)', fontSize: '0.8125rem', lineHeight: 1.5 }}>{profile.bio}</p>
           </div>
         )}
 
         {profile.joined_groups && profile.joined_groups.length > 0 && (
           <div>
-            <h3 style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Joined Study Groups ({profile.joined_groups.length})</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+              Enrolled Groups ({profile.joined_groups.length})
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
               {profile.joined_groups.map((g) => (
-                <div key={g.id} style={{ padding: '0.625rem 0.875rem', backgroundColor: 'var(--panel-bg)', borderRadius: '6px', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{g.title}</span>
-                  <span className="badge badge-emerald">{g.role.toUpperCase()}</span>
+                <div key={g.id} style={{ padding: '0.5rem 0.75rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-default)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--primary-navy)' }}>{g.title}</span>
+                  <span className="badge badge-blue">{g.role}</span>
                 </div>
               ))}
             </div>
