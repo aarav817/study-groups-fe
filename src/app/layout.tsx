@@ -83,7 +83,6 @@ function MainLayoutContent({ children }: { children: ReactNode }) {
               locked in<span className="logo-period">.</span>
             </span>
           </div>
-          <span className="brand-tagline">A simple study platform to boost your focus.</span>
         </Link>
         <HeaderNav />
       </header>

@@ -148,8 +148,8 @@ export default function GroupsPage() {
           </h1>
           <p className="page-subtitle">
             {viewTab === 'public'
-              ? 'Discover open academic study channels across university departments'
-              : 'Active study groups where you are currently enrolled'}
+              ? 'Find public study groups across a variety of courses'
+              : 'Active study groups that you are a member of'}
           </p>
         </div>
 
@@ -159,7 +159,7 @@ export default function GroupsPage() {
               className={`segmented-item ${viewTab === 'public' ? 'active' : ''}`}
               onClick={() => setViewTab('public')}
             >
-              Public Directory
+              Public Study Groups
             </button>
             <button
               className={`segmented-item ${viewTab === 'my' ? 'active' : ''}`}
@@ -189,18 +189,6 @@ export default function GroupsPage() {
           >
             Dismiss
           </button>
-        </div>
-      )}
-
-      {/* Zero Groups Notice */}
-      {myGroups.length === 0 && !loading && viewTab === 'my' && (
-        <div className="card" style={{ marginBottom: '1rem', padding: '0.875rem 1rem' }}>
-          <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary-navy)' }}>
-            No enrolled study groups yet
-          </h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.78125rem', marginTop: '0.15rem' }}>
-            Switch to the Public Directory below to find study groups, or use the buttons above to create your own.
-          </p>
         </div>
       )}
 

@@ -9,12 +9,6 @@ export default function LandingPage() {
 
   return (
     <div style={{ maxWidth: '880px', margin: '0 auto', padding: '3rem 1.5rem', textAlign: 'center' }}>
-      <div style={{ marginBottom: '1.25rem' }}>
-        <span className="badge badge-navy">
-          verified university network
-        </span>
-      </div>
-
       <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.65rem', marginBottom: '0.65rem' }}>
         <svg style={{ width: '2rem', height: '2rem', color: 'var(--primary-color)', flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -59,7 +53,7 @@ export default function LandingPage() {
           lineHeight: 1.5,
         }}
       >
-        Structured study groups, organized course files, and direct communication for verified university students.
+        Study groups, organized course files, and a messaging system to help you ace all your classes.
       </p>
 
       <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginBottom: '3rem' }}>
@@ -72,7 +66,7 @@ export default function LandingPage() {
             <Link href="/signup" className="btn btn-navy" style={{ padding: '0.55rem 1.25rem', fontSize: '0.875rem' }}>
               Create Account with .edu
             </Link>
-            <Link href="/login" className="btn btn-secondary" style={{ padding: '0.55rem 1.25rem', fontSize: '0.875rem' }}>
+            <Link href="/login" className="btn btn-navy" style={{ padding: '0.55rem 1.25rem', fontSize: '0.875rem' }}>
               Sign In
             </Link>
           </>
@@ -93,7 +87,7 @@ export default function LandingPage() {
           </div>
           <h3 className="card-title" style={{ fontSize: '1.05rem' }}>Course Study Groups</h3>
           <p className="card-description" style={{ margin: 0 }}>
-            Dedicated public and invite-only study channels structured specifically around your university courses.
+            Dedicated study channels that you can structure around your university courses.
           </p>
         </div>
 
@@ -101,9 +95,9 @@ export default function LandingPage() {
           <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
             Materials
           </div>
-          <h3 className="card-title" style={{ fontSize: '1.05rem' }}>Organized File Directories</h3>
+          <h3 className="card-title" style={{ fontSize: '1.05rem' }}>Organized Notes</h3>
           <p className="card-description" style={{ margin: 0 }}>
-            Upload, browse, and categorize notes, slide decks, and exam prep in clean folder hierarchies.
+            Upload, browse, and organize notes from yourself and your classmates.
           </p>
         </div>
 
@@ -111,9 +105,9 @@ export default function LandingPage() {
           <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
             Messaging
           </div>
-          <h3 className="card-title" style={{ fontSize: '1.05rem' }}>Direct Peer Chat</h3>
+          <h3 className="card-title" style={{ fontSize: '1.05rem' }}>Direct Chat Messaging</h3>
           <p className="card-description" style={{ margin: 0 }}>
-            Connect 1-on-1 with verified classmates using private 6-character user codes.
+            Connect 1-on-1 with others with a private messagin system.
           </p>
         </div>
       </div>
