@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
+import FileViewerModal, { formatBytes, getFormatBadgeStyle } from '@/components/FileViewerModal';
 
 interface GroupDetails {
   id: string;
@@ -121,6 +122,9 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
   const [creatingTopic, setCreatingTopic] = useState<boolean>(false);
 
   const [showMaterialModal, setShowMaterialModal] = useState<boolean>(false);
+  const [materialToDelete, setMaterialToDelete] = useState<Material | null>(null);
+  const [deletingMaterial, setDeletingMaterial] = useState<boolean>(false);
+  const [viewingMaterial, setViewingMaterial] = useState<Material | null>(null);
   const [matTitle, setMatTitle] = useState<string>('');
   const [matFormat, setMatFormat] = useState<string>('pdf');
   const [matUrl, setMatUrl] = useState<string>('');
@@ -607,15 +611,32 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
     }
   };
 
-  const handleDeleteMaterial = async (materialId: string) => {
+  const confirmDeleteMaterial = async () => {
+    if (!materialToDelete) return;
     try {
-      const res = await api.materials.delete(groupId, materialId);
+      setDeletingMaterial(true);
+      const res = await api.materials.delete(groupId, materialToDelete.id);
       if (res.success) {
-        setMaterials((prev) => prev.filter((m) => m.id !== materialId));
+        setMaterials((prev) => prev.filter((m) => m.id !== materialToDelete.id));
+        setMaterialToDelete(null);
       }
     } catch (err: any) {
       console.error('Failed to delete material:', err);
+    } finally {
+      setDeletingMaterial(false);
     }
+  };
+
+  const handleDownloadFile = (mat: { title: string; file_format: string; file_url: string; file_size_bytes?: number | string }) => {
+    const link = document.createElement('a');
+    link.href = mat.file_url;
+    const ext = mat.file_format ? mat.file_format.toLowerCase() : 'pdf';
+    const cleanTitle = mat.title.replace(/[/\\?%*:|"<>]/g, '_');
+    const filename = cleanTitle.toLowerCase().endsWith(`.${ext}`) ? cleanTitle : `${cleanTitle}.${ext}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleMemberContextMenu = (e: React.MouseEvent, member: Member) => {
@@ -1101,31 +1122,108 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                 {selectedFolderId ? 'No materials in this folder yet.' : 'No materials uploaded in this group yet.'}
               </p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                {filteredMaterials.map((m) => (
-                  <div key={m.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.45rem 0.75rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-default)' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--primary-navy)' }}>{m.title}</div>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.6875rem' }}>
-                        {m.file_format.toUpperCase()} • Uploaded by {m.uploader_name || 'Member'}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <a href={m.file_url} target="_blank" rel="noreferrer" className="btn btn-secondary btn-xs">
-                        View File &rarr;
-                      </a>
-                      {isOwnerOrAdmin && (
-                        <button
-                          onClick={() => handleDeleteMaterial(m.id)}
-                          className="icon-btn danger"
-                          title="Delete material"
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                {filteredMaterials.map((m) => {
+                  const badgeStyle = getFormatBadgeStyle(m.file_format);
+                  return (
+                    <div
+                      key={m.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.35rem 0.65rem',
+                        backgroundColor: 'var(--bg-subtle)',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--border-default)',
+                        gap: '0.75rem',
+                      }}
+                    >
+                      {/* Left side: Format badge, Title & Metadata */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', minWidth: 0, flex: 1 }}>
+                        <span
+                          style={{
+                            fontSize: '0.625rem',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            padding: '0.12rem 0.4rem',
+                            borderRadius: 'var(--radius-sm)',
+                            backgroundColor: badgeStyle.bg,
+                            color: badgeStyle.text,
+                            border: `1px solid ${badgeStyle.border}`,
+                            letterSpacing: '0.4px',
+                            flexShrink: 0,
+                          }}
                         >
-                          x
+                          {m.file_format.toUpperCase()}
+                        </span>
+
+                        <div style={{ minWidth: 0, display: 'flex', alignItems: 'baseline', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          <span
+                            onClick={() => setViewingMaterial(m)}
+                            style={{
+                              fontWeight: 600,
+                              fontSize: '0.8125rem',
+                              color: 'var(--primary-navy)',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              maxWidth: '320px',
+                            }}
+                            title={`View ${m.title}`}
+                          >
+                            {m.title}
+                          </span>
+
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.6875rem', whiteSpace: 'nowrap' }}>
+                            {formatBytes(m.file_size_bytes)} • {m.uploader_name || 'Member'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Right side: View, Download & Delete Buttons */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+                        <button
+                          type="button"
+                          onClick={() => setViewingMaterial(m)}
+                          className="btn btn-secondary btn-xs"
+                          style={{ padding: '0.2rem 0.5rem', fontSize: '0.6875rem', fontWeight: 500 }}
+                          title="Preview file"
+                        >
+                          View
                         </button>
-                      )}
+
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadFile(m)}
+                          className="btn btn-secondary btn-xs"
+                          style={{ padding: '0.2rem 0.5rem', fontSize: '0.6875rem', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                          title="Download file to device"
+                        >
+                          <svg style={{ width: '11px', height: '11px' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                          </svg>
+                          <span>Download</span>
+                        </button>
+
+                        {isOwnerOrAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => setMaterialToDelete(m)}
+                            className="icon-btn danger"
+                            style={{ width: '22px', height: '22px', fontSize: '0.75rem' }}
+                            title="Delete material"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -1480,6 +1578,42 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
           </div>
         </div>
       )}
+      {/* Delete Material Confirm Modal */}
+      {materialToDelete && (
+        <div className="confirm-overlay" onClick={() => !deletingMaterial && setMaterialToDelete(null)}>
+          <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
+            <h3>Delete Study Material</h3>
+            <p>
+              Are you sure you want to delete <strong>{materialToDelete.title}</strong>? This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setMaterialToDelete(null)}
+                disabled={deletingMaterial}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger btn-sm"
+                onClick={confirmDeleteMaterial}
+                disabled={deletingMaterial}
+              >
+                {deletingMaterial ? 'Deleting...' : 'Delete Material'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* File Viewer Modal */}
+      <FileViewerModal
+        material={viewingMaterial}
+        onClose={() => setViewingMaterial(null)}
+        onDownload={handleDownloadFile}
+      />
     </div>
   );
 }

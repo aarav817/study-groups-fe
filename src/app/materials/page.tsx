@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import FileViewerModal, { getFormatBadgeStyle } from '@/components/FileViewerModal';
 
 interface MaterialItem {
   id: string;
@@ -34,6 +35,7 @@ export default function MaterialsPage() {
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [viewingMaterial, setViewingMaterial] = useState<MaterialItem | null>(null);
 
   // Modals
   const [showMaterialModal, setShowMaterialModal] = useState<boolean>(false);
@@ -177,6 +179,18 @@ export default function MaterialsPage() {
     return parseFloat((num / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   };
 
+  const handleDownloadFile = (mat: { title: string; file_format: string; file_url: string; file_size_bytes?: number | string }) => {
+    const link = document.createElement('a');
+    link.href = mat.file_url;
+    const ext = mat.file_format ? mat.file_format.toLowerCase() : 'pdf';
+    const cleanTitle = mat.title.replace(/[/\\?%*:|"<>]/g, '_');
+    const filename = cleanTitle.toLowerCase().endsWith(`.${ext}`) ? cleanTitle : `${cleanTitle}.${ext}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const filteredMaterials = selectedFolderId
     ? materials.filter((m) => m.folder_id === selectedFolderId)
     : materials;
@@ -259,15 +273,30 @@ export default function MaterialsPage() {
                   <div>Format: {item.file_format.toUpperCase()} • {formatBytes(item.file_size_bytes)}</div>
                 </div>
               </div>
-              <a
-                href={item.file_url}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-secondary btn-xs"
-                style={{ marginTop: '0.75rem', textAlign: 'center' }}
-              >
-                View Document &rarr;
-              </a>
+              <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.75rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setViewingMaterial(item)}
+                  className="btn btn-secondary btn-xs"
+                  style={{ flex: 1, textAlign: 'center' }}
+                >
+                  View File
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDownloadFile(item)}
+                  className="btn btn-secondary btn-xs"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                  title="Download File"
+                >
+                  <svg style={{ width: '12px', height: '12px' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  <span>Download</span>
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -371,6 +400,12 @@ export default function MaterialsPage() {
           </div>
         </div>
       )}
+      {/* File Viewer Modal */}
+      <FileViewerModal
+        material={viewingMaterial}
+        onClose={() => setViewingMaterial(null)}
+        onDownload={handleDownloadFile}
+      />
     </div>
   );
 }
