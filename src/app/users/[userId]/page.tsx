@@ -43,7 +43,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
               const parsed = JSON.parse(savedPrivacy);
               if (parsed.emailVisibility) setEmailVisibility(parsed.emailVisibility);
               if (parsed.messagingCodeVisibility) setMessagingCodeVisibility(parsed.messagingCodeVisibility);
-            } catch (e) {}
+            } catch (e) { }
           }
         }
       } catch (err) {
@@ -111,7 +111,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
             <h1 className="page-title" style={{ fontSize: '1.35rem', margin: 0, color: 'var(--primary-navy)' }}>
               {profile.full_name}
             </h1>
-            
+
             {showEmail && (
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', marginTop: '0.15rem' }}>
                 {profile.email}
@@ -141,7 +141,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
         {/* Bio / Study Interests */}
         <div style={{ marginBottom: '1.25rem' }}>
           <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-            Academic Bio & Study Focus
+            Bio
           </div>
           {profile.bio ? (
             <p style={{ color: 'var(--text-primary)', fontSize: '0.8125rem', lineHeight: 1.5 }}>

@@ -121,7 +121,7 @@ function MainLayoutContent({ children }: { children: ReactNode }) {
               </>
             )}
 
-            <div className="sidebar-heading" style={{ marginTop: 'auto', paddingTop: '0.75rem' }}>Preferences</div>
+            <div className="sidebar-heading" style={{ marginTop: 'auto', paddingTop: '0.75rem' }}></div>
             <nav>
               <Link href="/account" className={pathname === '/account' ? 'active' : ''}>
                 <span>Profile</span>

@@ -235,16 +235,6 @@ export default function GroupsPage() {
                   >
                     {group.title}
                   </Link>
-
-                  <div style={{ display: 'flex', gap: '0.25rem', flexShrink: 0 }}>
-                    {group.is_public !== false ? (
-                      <span className="badge badge-blue">Public</span>
-                    ) : (
-                      <span className="badge badge-navy">Private</span>
-                    )}
-
-                    {isMember && <span className="badge badge-emerald">Enrolled</span>}
-                  </div>
                 </div>
 
                 <p className="card-description">{group.description || 'No description provided.'}</p>
