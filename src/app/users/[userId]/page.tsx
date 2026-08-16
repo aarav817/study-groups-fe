@@ -26,6 +26,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
   // Privacy visibility settings
   const [emailVisibility, setEmailVisibility] = useState<'private' | 'public'>('private');
   const [messagingCodeVisibility, setMessagingCodeVisibility] = useState<'private' | 'public'>('private');
+  const [groupsVisibility, setGroupsVisibility] = useState<'private' | 'public'>('private');
 
   useEffect(() => {
     async function loadUser() {
@@ -43,7 +44,8 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
               const parsed = JSON.parse(savedPrivacy);
               if (parsed.emailVisibility) setEmailVisibility(parsed.emailVisibility);
               if (parsed.messagingCodeVisibility) setMessagingCodeVisibility(parsed.messagingCodeVisibility);
-            } catch (e) { }
+              if (parsed.groupsVisibility) setGroupsVisibility(parsed.groupsVisibility);
+            } catch (e) {}
           }
         }
       } catch (err) {
@@ -79,6 +81,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
   const isOwnerViewer = currentUser?.id === userId;
   const showEmail = isOwnerViewer || emailVisibility === 'public';
   const showMessagingCode = isOwnerViewer || messagingCodeVisibility === 'public';
+  const showGroups = isOwnerViewer || groupsVisibility === 'public';
 
   return (
     <div style={{ maxWidth: '580px', margin: '0 auto' }}>
@@ -138,7 +141,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
           </div>
         </div>
 
-        {/* Bio / Study Interests */}
+        {/* Bio */}
         <div style={{ marginBottom: '1.25rem' }}>
           <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
             Bio
@@ -154,11 +157,16 @@ export default function UserProfilePage({ params }: { params: Promise<{ userId: 
           )}
         </div>
 
-        {/* Enrolled Groups */}
-        {profile.joined_groups && profile.joined_groups.length > 0 && (
+        {/* Enrolled Groups (respecting privacy setting) */}
+        {showGroups && profile.joined_groups && profile.joined_groups.length > 0 && (
           <div>
             <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.45rem' }}>
               Enrolled Study Groups ({profile.joined_groups.length})
+              {isOwnerViewer && groupsVisibility === 'private' && (
+                <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'none', marginLeft: '0.35rem', fontWeight: 400 }}>
+                  (Private to other students)
+                </span>
+              )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
               {profile.joined_groups.map((g) => (

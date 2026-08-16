@@ -651,19 +651,6 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
       <div className="card" style={{ marginBottom: '1rem', padding: '1rem 1.25rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
-              <span className={`badge ${group.is_public ? 'badge-blue' : 'badge-navy'}`}>
-                {group.is_public ? 'Public' : 'Private'}
-              </span>
-              <span className="badge badge-navy">
-                {maxMembersCap ? `Members: ${members.length} / ${maxMembersCap}` : `Members: ${members.length}`}
-              </span>
-              {myRole && (
-                <span className="badge badge-emerald">
-                  Role: {myRole}
-                </span>
-              )}
-            </div>
             <h1 className="page-title" style={{ fontSize: '1.5rem', marginBottom: '0.2rem' }}>{group.title}</h1>
             {group.description && <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', lineHeight: 1.4 }}>{group.description}</p>}
           </div>

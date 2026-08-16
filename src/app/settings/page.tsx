@@ -8,6 +8,7 @@ export default function SettingsPage() {
   const { user } = useAuth();
   const [emailVisibility, setEmailVisibility] = useState<'private' | 'public'>('private');
   const [messagingCodeVisibility, setMessagingCodeVisibility] = useState<'private' | 'public'>('private');
+  const [groupsVisibility, setGroupsVisibility] = useState<'private' | 'public'>('private');
   const [emailNotifications, setEmailNotifications] = useState<boolean>(true);
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
 
@@ -19,6 +20,7 @@ export default function SettingsPage() {
           const parsed = JSON.parse(saved);
           if (parsed.emailVisibility) setEmailVisibility(parsed.emailVisibility);
           if (parsed.messagingCodeVisibility) setMessagingCodeVisibility(parsed.messagingCodeVisibility);
+          if (parsed.groupsVisibility) setGroupsVisibility(parsed.groupsVisibility);
         } catch (e) {}
       }
     }
@@ -32,6 +34,7 @@ export default function SettingsPage() {
         JSON.stringify({
           emailVisibility,
           messagingCodeVisibility,
+          groupsVisibility,
         })
       );
       setSavedSuccess(true);
@@ -73,7 +76,7 @@ export default function SettingsPage() {
               Profile Privacy & Visibility
             </h3>
             <p style={{ fontSize: '0.78125rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
-              Control whether other students can see your email address and messaging code when viewing your profile.
+              Control what information other students can see when viewing your user profile.
             </p>
 
             {savedSuccess && (
@@ -121,6 +124,28 @@ export default function SettingsPage() {
                     type="button"
                     onClick={() => setMessagingCodeVisibility('public')}
                     className={`btn ${messagingCodeVisibility === 'public' ? 'btn-navy' : 'btn-secondary'} btn-xs`}
+                  >
+                    Public (Visible on Profile)
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78125rem', fontWeight: 600, color: 'var(--primary-navy)', marginBottom: '0.35rem' }}>
+                  Enrolled Study Groups Visibility
+                </label>
+                <div style={{ display: 'flex', gap: '0.4rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setGroupsVisibility('private')}
+                    className={`btn ${groupsVisibility === 'private' ? 'btn-navy' : 'btn-secondary'} btn-xs`}
+                  >
+                    Private (Default - Hidden)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGroupsVisibility('public')}
+                    className={`btn ${groupsVisibility === 'public' ? 'btn-navy' : 'btn-secondary'} btn-xs`}
                   >
                     Public (Visible on Profile)
                   </button>
