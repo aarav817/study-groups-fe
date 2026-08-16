@@ -194,7 +194,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
 
       if (mRes.status === 'fulfilled' && mRes.value?.success) setMembers(mRes.value.data?.members || []);
       if (eRes.status === 'fulfilled' && eRes.value?.success) setEvents(eRes.value.data?.events || []);
-      
+
       if (convRes.status === 'fulfilled' && convRes.value?.success) {
         const convs = convRes.value.data?.conversations || [];
         setConversations(convs);
@@ -248,7 +248,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
           if (typeof parsed.allowMemberChat === 'boolean') setAllowMemberChat(parsed.allowMemberChat);
           if (typeof parsed.allowMemberEvents === 'boolean') setAllowMemberEvents(parsed.allowMemberEvents);
           if (typeof parsed.allowMemberInvites === 'boolean') setAllowMemberInvites(parsed.allowMemberInvites);
-        } catch (e) {}
+        } catch (e) { }
       }
     }
   }, [groupId]);
@@ -1080,7 +1080,6 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                           transition: 'all 0.12s ease',
                         }}
                       >
-                        <span className="badge badge-navy" style={{ fontSize: '0.625rem' }}>DIR</span>
                         <div>
                           <div style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--primary-navy)' }}>{folder.name}</div>
                           <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>{count} {count === 1 ? 'file' : 'files'}</div>
