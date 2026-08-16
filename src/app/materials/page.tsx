@@ -187,7 +187,7 @@ export default function MaterialsPage() {
         <div>
           <h1 className="page-title">Study Materials Library</h1>
           <p className="page-subtitle">
-            Shared notes, practice problems, slide decks, and exam prep organized across course folders.
+            Directory of all materials throughout your courses.
           </p>
         </div>
         {userGroups.length > 0 && (

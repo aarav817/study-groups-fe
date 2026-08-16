@@ -21,7 +21,7 @@ export default function SettingsPage() {
           if (parsed.emailVisibility) setEmailVisibility(parsed.emailVisibility);
           if (parsed.messagingCodeVisibility) setMessagingCodeVisibility(parsed.messagingCodeVisibility);
           if (parsed.groupsVisibility) setGroupsVisibility(parsed.groupsVisibility);
-        } catch (e) {}
+        } catch (e) { }
       }
     }
   }, [user]);
@@ -48,28 +48,13 @@ export default function SettingsPage() {
         <div>
           <h1 className="page-title">Settings & Preferences</h1>
           <p className="page-subtitle">
-            Manage your application preferences, profile privacy, notifications, and security.
+            Manage your application preferences, profile privacy, and notifications.
           </p>
         </div>
       </div>
 
       <div className="card">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {/* Profile Identity */}
-          <div>
-            <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary-navy)', marginBottom: '0.25rem' }}>
-              Profile & Account Identity
-            </h3>
-            <p style={{ fontSize: '0.78125rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-              Update your full name, avatar photo, academic bio, and 6-character user code.
-            </p>
-            <Link href="/account" className="btn btn-secondary btn-xs">
-              Manage Profile &rarr;
-            </Link>
-          </div>
-
-          <hr style={{ border: 'none', borderTop: '1px solid var(--border-subtle)' }} />
-
           {/* Profile Privacy & Visibility */}
           <div>
             <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary-navy)', marginBottom: '0.25rem' }}>
@@ -153,7 +138,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <button type="submit" className="btn btn-navy btn-sm" style={{ marginTop: '0.25rem' }}>
+                <button type="submit" className="btn" style={{ marginTop: '0.75rem' }}>
                   Save Privacy Settings
                 </button>
               </div>
@@ -176,20 +161,8 @@ export default function SettingsPage() {
                 checked={emailNotifications}
                 onChange={(e) => setEmailNotifications(e.target.checked)}
               />
-              <span>Email notifications for new group messages, events, and chat requests</span>
+              <span>Email notifications for new member joins in your owned groups</span>
             </label>
-          </div>
-
-          <hr style={{ border: 'none', borderTop: '1px solid var(--border-subtle)' }} />
-
-          {/* Institutional Security */}
-          <div>
-            <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary-navy)', marginBottom: '0.25rem' }}>
-              Institutional Security
-            </h3>
-            <p style={{ fontSize: '0.78125rem', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
-              Your account is authenticated via verified university email credentials and secure HTTP-Only session cookies.
-            </p>
           </div>
         </div>
       </div>

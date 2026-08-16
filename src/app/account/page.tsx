@@ -80,7 +80,7 @@ export default function AccountPage() {
         <div>
           <h1 className="page-title">Account Profile</h1>
           <p className="page-subtitle">
-            Manage your personal profile, avatar photo, academic bio, and 6-character user code.
+            Manage your personal profile, avatar photo, and bio.
           </p>
         </div>
       </div>

@@ -132,7 +132,7 @@ export default function DirectMessagesPage() {
         <div>
           <h1 className="page-title">Direct Messages</h1>
           <p className="page-subtitle">
-            Private 1-on-1 peer chats with verified university classmates.
+            1-on-1 messaging with your classmates.
           </p>
         </div>
       </div>
@@ -216,7 +216,6 @@ export default function DirectMessagesPage() {
                       <div style={{ fontWeight: 500, fontSize: '0.78125rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {chat.partner_name}
                       </div>
-                      <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>{chat.partner_code}</div>
                     </div>
                   </button>
                 ))}

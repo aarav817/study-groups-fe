@@ -176,7 +176,7 @@ export default function CalendarPage() {
         <div>
           <h1 className="page-title">Study Sessions Calendar</h1>
           <p className="page-subtitle">
-            Scheduled group study sessions, exam reviews, and office hours across your enrolled courses.
+            Scheduled study sessions and group events across your enrolled courses.
           </p>
         </div>
 
@@ -297,8 +297,8 @@ export default function CalendarPage() {
       {showEventModal && (
         <div className="modal-overlay" onClick={() => setShowEventModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Schedule Study Session</h2>
-            <p className="modal-subtitle">Add a group study meeting to the shared calendar.</p>
+            <h2 className="modal-title">Schedule Event</h2>
+            <p className="modal-subtitle">Add an event to the calendar in a specific group.</p>
             {eventError && <div className="alert-banner alert-danger"><span>{eventError}</span></div>}
             <form onSubmit={handleCreateEvent}>
               <div className="form-group">
