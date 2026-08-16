@@ -44,7 +44,7 @@ describe('Account Profile Editor (Jest + React Testing Library)', () => {
 
     expect(screen.getByText(/A183E1/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/full name/i)).toHaveValue('Alex Morgan');
-    expect(screen.getByLabelText(/university email/i)).toHaveValue('alex@stanford.edu');
+    expect(screen.getByLabelText(/^email/i)).toHaveValue('alex@stanford.edu');
     expect(screen.getByLabelText(/upload profile photo/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/bio \/ study interests/i)).toHaveValue('CS Undergrad');
     expect(screen.getByRole('button', { name: /save profile changes/i })).toBeInTheDocument();

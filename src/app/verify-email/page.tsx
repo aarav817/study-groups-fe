@@ -125,7 +125,7 @@ function VerifyEmailContent() {
               <label>Resend Verification Link</label>
               <input
                 type="email"
-                placeholder="Enter your .edu email"
+                placeholder="Enter your email"
                 value={resendEmail}
                 onChange={(e) => setResendEmail(e.target.value)}
                 required

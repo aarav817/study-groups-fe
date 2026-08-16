@@ -64,7 +64,7 @@ export default function LandingPage() {
         ) : (
           <>
             <Link href="/signup" className="btn btn-navy" style={{ padding: '0.55rem 1.25rem', fontSize: '0.875rem' }}>
-              Create Account with .edu
+              Create Account
             </Link>
             <Link href="/login" className="btn btn-secondary" style={{ padding: '0.55rem 1.25rem', fontSize: '0.875rem' }}>
               Sign In

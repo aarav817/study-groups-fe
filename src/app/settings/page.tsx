@@ -73,7 +73,7 @@ export default function SettingsPage() {
             <form onSubmit={handleSavePrivacy} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.78125rem', fontWeight: 600, color: 'var(--primary-navy)', marginBottom: '0.35rem' }}>
-                  University Email Visibility
+                  Email Visibility
                 </label>
                 <div style={{ display: 'flex', gap: '0.4rem' }}>
                   <button

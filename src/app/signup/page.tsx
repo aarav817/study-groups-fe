@@ -19,11 +19,6 @@ export default function SignupPage() {
     e.preventDefault();
     setError('');
 
-    if (!email.toLowerCase().endsWith('.edu')) {
-      setError('Please provide a valid university email address ending in .edu (e.g. alex@stanford.edu).');
-      return;
-    }
-
     if (password.length < 8) {
       setError('Password must be at least 8 characters long.');
       return;
@@ -81,7 +76,7 @@ export default function SignupPage() {
             Check Your Email Inbox
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', lineHeight: '1.5', marginBottom: '1.25rem' }}>
-            A verification link has been sent to <strong>{submittedEmail}</strong>. Please check your inbox and click the link to activate your university account.
+            A verification link has been sent to <strong>{submittedEmail}</strong>. Please check your inbox and click the link to activate your account.
           </p>
 
           {resendStatus && (
@@ -145,17 +140,17 @@ export default function SignupPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">University Email (.edu)</label>
+              <label htmlFor="email">Email</label>
               <input
                 type="email"
                 id="email"
-                placeholder="alice@stanford.edu"
+                placeholder="alice@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <span style={{ color: 'var(--text-muted)', fontSize: '0.6875rem', marginTop: '0.2rem', display: 'block' }}>
-                Must be an active .edu address for institutional verification.
+                A verification link will be sent to this email address.
               </span>
             </div>
 

@@ -146,7 +146,7 @@ export default function AccountPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="userEmail">University Email</label>
+            <label htmlFor="userEmail">Email</label>
             <input id="userEmail" type="text" value={user.email} disabled style={{ backgroundColor: 'var(--bg-subtle)', cursor: 'not-allowed', color: 'var(--text-muted)' }} />
           </div>
 
