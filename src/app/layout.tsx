@@ -43,7 +43,7 @@ function HeaderNav() {
           <Link href="/login" className={pathname === '/login' ? 'active' : ''}>
             Sign In
           </Link>
-          <Link href="/signup" className="btn btn-primary btn-sm">
+          <Link href="/signup" className={pathname === '/signup' ? 'active' : ''}>
             Sign Up
           </Link>
         </>

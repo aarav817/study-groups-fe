@@ -56,6 +56,7 @@ interface Message {
   conversation_id?: string | null;
   sender_id: string;
   sender_name?: string;
+  sender_avatar?: string | null;
   content: string;
   created_at: string;
 }
@@ -141,6 +142,17 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
   const [settingsError, setSettingsError] = useState<string>('');
   const [savingSettings, setSavingSettings] = useState<boolean>(false);
 
+  // Group Capacity & Permissions
+  const [maxMembersCap, setMaxMembersCap] = useState<string>('');
+  const [allowMemberUpload, setAllowMemberUpload] = useState<boolean>(true);
+  const [allowMemberChat, setAllowMemberChat] = useState<boolean>(true);
+  const [allowMemberEvents, setAllowMemberEvents] = useState<boolean>(true);
+  const [allowMemberInvites, setAllowMemberInvites] = useState<boolean>(true);
+
+  // Leave Confirmation
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState<boolean>(false);
+  const [leavingGroup, setLeavingGroup] = useState<boolean>(false);
+
   // Delete Confirmation
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
   const [deletingGroup, setDeletingGroup] = useState<boolean>(false);
@@ -158,6 +170,12 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
   const isOwner = myRole === 'owner';
   const isAdmin = myRole === 'admin';
   const isOwnerOrAdmin = isOwner || isAdmin;
+
+  // Permission helpers
+  const canUpload = isOwnerOrAdmin || allowMemberUpload;
+  const canChat = isOwnerOrAdmin || allowMemberChat;
+  const canCreateEvents = isOwnerOrAdmin || allowMemberEvents;
+  const canGenerateInvites = isOwnerOrAdmin || allowMemberInvites;
 
   const loadGroupData = async () => {
     try {
@@ -218,6 +236,21 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
 
   useEffect(() => {
     loadGroupData();
+    if (typeof window !== 'undefined') {
+      const savedCap = localStorage.getItem(`group_cap_${groupId}`);
+      if (savedCap) setMaxMembersCap(savedCap);
+
+      const savedPerms = localStorage.getItem(`group_permissions_${groupId}`);
+      if (savedPerms) {
+        try {
+          const parsed = JSON.parse(savedPerms);
+          if (typeof parsed.allowMemberUpload === 'boolean') setAllowMemberUpload(parsed.allowMemberUpload);
+          if (typeof parsed.allowMemberChat === 'boolean') setAllowMemberChat(parsed.allowMemberChat);
+          if (typeof parsed.allowMemberEvents === 'boolean') setAllowMemberEvents(parsed.allowMemberEvents);
+          if (typeof parsed.allowMemberInvites === 'boolean') setAllowMemberInvites(parsed.allowMemberInvites);
+        } catch (e) {}
+      }
+    }
   }, [groupId]);
 
   // Close context menu on click outside
@@ -467,6 +500,24 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
     setShowSettingsModal(true);
   };
 
+  const handleLeaveGroup = async () => {
+    if (!user) return;
+    try {
+      setLeavingGroup(true);
+      const res = await api.memberships.leaveGroup(groupId, user.id);
+      if (res.success) {
+        router.push('/groups');
+      } else {
+        alert(res.error?.message || 'Failed to leave group.');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to leave group.');
+    } finally {
+      setLeavingGroup(false);
+      setShowLeaveConfirm(false);
+    }
+  };
+
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setSettingsError('');
@@ -485,6 +536,22 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
       });
 
       if (res.success) {
+        if (typeof window !== 'undefined') {
+          if (maxMembersCap.trim()) {
+            localStorage.setItem(`group_cap_${groupId}`, maxMembersCap.trim());
+          } else {
+            localStorage.removeItem(`group_cap_${groupId}`);
+          }
+          localStorage.setItem(
+            `group_permissions_${groupId}`,
+            JSON.stringify({
+              allowMemberUpload,
+              allowMemberChat,
+              allowMemberEvents,
+              allowMemberInvites,
+            })
+          );
+        }
         setShowSettingsModal(false);
         loadGroupData();
       } else {
@@ -582,11 +649,14 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
     <div>
       {/* Workspace Header Card */}
       <div className="card" style={{ marginBottom: '1rem', padding: '1rem 1.25rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
               <span className={`badge ${group.is_public ? 'badge-blue' : 'badge-navy'}`}>
                 {group.is_public ? 'Public' : 'Private'}
+              </span>
+              <span className="badge badge-navy">
+                {maxMembersCap ? `Members: ${members.length} / ${maxMembersCap}` : `Members: ${members.length}`}
               </span>
               {myRole && (
                 <span className="badge badge-emerald">
@@ -598,15 +668,27 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
             {group.description && <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', lineHeight: 1.4 }}>{group.description}</p>}
           </div>
 
-          <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0, alignItems: 'center' }}>
+            {myRole && !isOwner && (
+              <button
+                onClick={() => setShowLeaveConfirm(true)}
+                className="btn btn-secondary btn-sm"
+                style={{ color: 'var(--accent-rose)' }}
+                title="Leave study group"
+              >
+                Leave Group
+              </button>
+            )}
             {isOwnerOrAdmin && (
               <button onClick={openSettingsModal} className="btn btn-secondary btn-sm" id="group-settings-btn">
                 Settings
               </button>
             )}
-            <button onClick={handleGenerateInvite} className="btn btn-secondary btn-sm">
-              Generate Invite Link
-            </button>
+            {canGenerateInvites && (
+              <button onClick={handleGenerateInvite} className="btn btn-secondary btn-sm">
+                Generate Invite Link
+              </button>
+            )}
           </div>
         </div>
 
@@ -651,17 +733,17 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
 
         {/* Action Buttons Toolbar */}
         <div style={{ display: 'flex', gap: '0.4rem' }}>
-          {activeTab === 'chat' && (
+          {activeTab === 'chat' && canChat && (
             <button onClick={() => setShowTopicModal(true)} className="btn btn-navy btn-sm">
               + New Topic
             </button>
           )}
-          {activeTab === 'events' && (
+          {activeTab === 'events' && canCreateEvents && (
             <button onClick={() => setShowEventModal(true)} className="btn btn-navy btn-sm">
               + Schedule Event
             </button>
           )}
-          {activeTab === 'materials' && (
+          {activeTab === 'materials' && canUpload && (
             <>
               <button onClick={() => setShowFolderModal(true)} className="btn btn-secondary btn-sm">
                 + New Folder
@@ -678,7 +760,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
       <div className="card" style={{ padding: '1rem' }}>
         {/* GROUP CHAT STREAM */}
         {activeTab === 'chat' && (
-          <div style={{ display: 'flex', flexDirection: 'column', height: '440px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '450px' }}>
             {/* Topic Pills */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', overflowX: 'auto', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid var(--border-subtle)' }}>
               {conversations.map((conv) => {
@@ -721,45 +803,96 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                 );
               })}
 
-              <button
-                onClick={() => setShowTopicModal(true)}
-                style={{ padding: '0.25rem 0.55rem', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem', backgroundColor: 'transparent', border: '1px dashed var(--border-strong)', color: 'var(--text-muted)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
-              >
-                + Topic
-              </button>
+              {canChat && (
+                <button
+                  onClick={() => setShowTopicModal(true)}
+                  style={{ padding: '0.25rem 0.55rem', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem', backgroundColor: 'transparent', border: '1px dashed var(--border-strong)', color: 'var(--text-muted)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+                >
+                  + Topic
+                </button>
+              )}
             </div>
 
-            {/* Chat Messages */}
-            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.3rem', marginBottom: '0.5rem', paddingRight: '0.25rem' }}>
+            {/* Bubble Chat Messages */}
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.45rem', marginBottom: '0.65rem', paddingRight: '0.25rem' }}>
               {messages.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8125rem', margin: 'auto' }}>
                   No messages in this topic yet.
                 </div>
               ) : (
-                messages.map((m) => (
-                  <div key={m.id} style={{ padding: '0.35rem 0.6rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', display: 'flex', gap: '0.5rem', alignItems: 'baseline' }}>
-                    <span style={{ fontWeight: 600, fontSize: '0.78125rem', color: 'var(--primary-navy)', flexShrink: 0 }}>
-                      {m.sender_name || 'Member'}:
-                    </span>
-                    <span style={{ fontSize: '0.8125rem', color: 'var(--text-primary)' }}>{m.content}</span>
-                  </div>
-                ))
+                messages.map((m) => {
+                  const isMe = m.sender_id === user?.id;
+                  const senderMember = members.find((mem) => mem.user_id === m.sender_id);
+                  const avatarUrl = m.sender_avatar || senderMember?.avatar_url;
+                  const senderName = m.sender_name || senderMember?.full_name || 'Member';
+
+                  return (
+                    <div key={m.id} className={`chat-bubble-row ${isMe ? 'me' : 'other'}`}>
+                      <Link href={`/users/${m.sender_id}`} title={senderName} style={{ flexShrink: 0, textDecoration: 'none' }}>
+                        {avatarUrl ? (
+                          <img
+                            src={avatarUrl}
+                            alt={senderName}
+                            style={{
+                              width: '26px',
+                              height: '26px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              border: '1px solid var(--border-default)',
+                            }}
+                          />
+                        ) : (
+                          <div
+                            className="avatar-circle"
+                            style={{
+                              width: '26px',
+                              height: '26px',
+                              fontSize: '0.6875rem',
+                              backgroundColor: isMe ? 'var(--primary-subtle)' : 'var(--bg-subtle)',
+                              color: isMe ? 'var(--primary-color)' : 'var(--primary-navy)',
+                            }}
+                          >
+                            {senderName.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </Link>
+
+                      <div className={`chat-bubble ${isMe ? 'me' : 'other'}`}>
+                        <div className="chat-bubble-header">
+                          <Link href={`/users/${m.sender_id}`} className="chat-bubble-sender">
+                            {isMe ? 'You' : senderName}
+                          </Link>
+                          <span className="chat-bubble-time">
+                            {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <div className="chat-bubble-content">{m.content}</div>
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
 
-            <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '0.4rem' }}>
-              <input
-                type="text"
-                className="form-control"
-                placeholder={`Post to #${conversations.find((c) => c.id === activeConvId)?.title || 'general'}...`}
-                value={newMsg}
-                onChange={(e) => setNewMsg(e.target.value)}
-                style={{ padding: '0.4rem 0.65rem', fontSize: '0.8125rem' }}
-              />
-              <button type="submit" className="btn btn-navy btn-sm">
-                Send
-              </button>
-            </form>
+            {canChat ? (
+              <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '0.4rem' }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder={`Post to #${conversations.find((c) => c.id === activeConvId)?.title || 'general'}...`}
+                  value={newMsg}
+                  onChange={(e) => setNewMsg(e.target.value)}
+                  style={{ padding: '0.4rem 0.65rem', fontSize: '0.8125rem' }}
+                />
+                <button type="submit" className="btn btn-navy btn-sm">
+                  Send
+                </button>
+              </form>
+            ) : (
+              <div style={{ padding: '0.45rem 0.75rem', backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+                Sending chat messages is restricted to group admins.
+              </div>
+            )}
           </div>
         )}
 
@@ -769,18 +902,71 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
             <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
               Enrolled Members ({members.length})
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               {members.map((m) => (
                 <div
                   key={m.id}
                   onContextMenu={(e) => handleMemberContextMenu(e, m)}
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0.75rem', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)', cursor: isOwner && m.user_id !== user?.id && m.role !== 'owner' ? 'context-menu' : 'default' }}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.5rem 0.75rem',
+                    backgroundColor: 'var(--bg-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-default)',
+                    cursor: isOwner && m.user_id !== user?.id && m.role !== 'owner' ? 'context-menu' : 'default',
+                  }}
                 >
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--primary-navy)' }}>{m.full_name}</div>
-                    <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>{m.email}</div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Link
+                    href={`/users/${m.user_id}`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.65rem',
+                      textDecoration: 'none',
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                    title="View read-only profile"
+                  >
+                    {m.avatar_url ? (
+                      <img
+                        src={m.avatar_url}
+                        alt={m.full_name}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: '1px solid var(--border-default)',
+                          flexShrink: 0,
+                        }}
+                      />
+                    ) : (
+                      <div
+                        className="avatar-circle"
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          fontSize: '0.8125rem',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {m.full_name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.8125rem', color: 'var(--primary-navy)' }}>
+                        {m.full_name}
+                      </div>
+                      <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
+                        Click to view profile
+                      </div>
+                    </div>
+                  </Link>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
                     <span className={`badge ${m.role === 'owner' ? 'badge-navy' : m.role === 'admin' ? 'badge-amber' : 'badge-blue'}`}>
                       {m.role}
                     </span>
@@ -1013,13 +1199,31 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
         </div>
       )}
 
+      {/* Leave Group Confirm Modal */}
+      {showLeaveConfirm && (
+        <div className="confirm-overlay" onClick={() => !leavingGroup && setShowLeaveConfirm(false)}>
+          <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
+            <h3>Leave Study Group</h3>
+            <p>
+              Are you sure you want to leave <strong>{group.title}</strong>? You can rejoin later if the group is public or via an invite link.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+              <button className="btn btn-secondary btn-sm" onClick={() => setShowLeaveConfirm(false)} disabled={leavingGroup}>Cancel</button>
+              <button className="btn btn-danger btn-sm" onClick={handleLeaveGroup} disabled={leavingGroup}>
+                {leavingGroup ? 'Leaving...' : 'Leave Group'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Group Settings Modal */}
       {showSettingsModal && (
         <div className="modal-overlay" onClick={() => setShowSettingsModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2 className="modal-title">Group Settings</h2>
             <p className="modal-subtitle">
-              {isOwner ? 'Manage group title, visibility, and deletion.' : 'Edit group title and description.'}
+              {isOwner ? 'Manage group title, member limits, permissions, and visibility.' : 'Edit group title and description.'}
             </p>
 
             {settingsError && (
@@ -1038,6 +1242,64 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label>Description</label>
                   <textarea rows={2} value={settingsDesc} onChange={(e) => setSettingsDesc(e.target.value)} />
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <div className="settings-section-title">Member Capacity</div>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label>Maximum Members Cap</label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="No limit (unlimited)"
+                    value={maxMembersCap}
+                    onChange={(e) => setMaxMembersCap(e.target.value)}
+                  />
+                  <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+                    Leave blank for unlimited capacity.
+                  </span>
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <div className="settings-section-title">Member Permissions</div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+                  Configure what regular group members are permitted to do.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78125rem', color: 'var(--text-primary)', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={allowMemberUpload}
+                      onChange={(e) => setAllowMemberUpload(e.target.checked)}
+                    />
+                    <span>Allow members to upload materials & create folders</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78125rem', color: 'var(--text-primary)', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={allowMemberChat}
+                      onChange={(e) => setAllowMemberChat(e.target.checked)}
+                    />
+                    <span>Allow members to send messages in chat topics</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78125rem', color: 'var(--text-primary)', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={allowMemberEvents}
+                      onChange={(e) => setAllowMemberEvents(e.target.checked)}
+                    />
+                    <span>Allow members to schedule study sessions & events</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78125rem', color: 'var(--text-primary)', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={allowMemberInvites}
+                      onChange={(e) => setAllowMemberInvites(e.target.checked)}
+                    />
+                    <span>Allow members to generate invite links</span>
+                  </label>
                 </div>
               </div>
 

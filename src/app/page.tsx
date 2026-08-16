@@ -66,7 +66,7 @@ export default function LandingPage() {
             <Link href="/signup" className="btn btn-navy" style={{ padding: '0.55rem 1.25rem', fontSize: '0.875rem' }}>
               Create Account with .edu
             </Link>
-            <Link href="/login" className="btn btn-navy" style={{ padding: '0.55rem 1.25rem', fontSize: '0.875rem' }}>
+            <Link href="/login" className="btn btn-secondary" style={{ padding: '0.55rem 1.25rem', fontSize: '0.875rem' }}>
               Sign In
             </Link>
           </>
@@ -87,7 +87,7 @@ export default function LandingPage() {
           </div>
           <h3 className="card-title" style={{ fontSize: '1.05rem' }}>Course Study Groups</h3>
           <p className="card-description" style={{ margin: 0 }}>
-            Dedicated study channels that you can structure around your university courses.
+            Dedicated study channels for your university courses.
           </p>
         </div>
 
@@ -107,7 +107,7 @@ export default function LandingPage() {
           </div>
           <h3 className="card-title" style={{ fontSize: '1.05rem' }}>Direct Chat Messaging</h3>
           <p className="card-description" style={{ margin: 0 }}>
-            Connect 1-on-1 with others with a private messagin system.
+            Connect 1-on-1 with others with a private messaging system.
           </p>
         </div>
       </div>
