@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
-import FileViewerModal, { formatBytes, getFormatBadgeStyle } from '@/components/FileViewerModal';
+import FileViewerModal, { formatBytes } from '@/components/FileViewerModal';
 
 interface GroupDetails {
   id: string;
@@ -16,6 +16,7 @@ interface GroupDetails {
   creator_name?: string;
   creator_email?: string;
   member_count?: number;
+  max_members: number | null;
   user_membership?: { role: string } | null;
 }
 
@@ -187,6 +188,7 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
       const groupRes = await api.groups.getDetails(groupId);
       if (groupRes.success && groupRes.data?.group) {
         setGroup(groupRes.data.group);
+        setMaxMembersCap(groupRes.data.group.max_members == null ? '' : String(groupRes.data.group.max_members));
       }
 
       const [mRes, eRes, convRes, matRes] = await Promise.allSettled([
@@ -241,9 +243,6 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
   useEffect(() => {
     loadGroupData();
     if (typeof window !== 'undefined') {
-      const savedCap = localStorage.getItem(`group_cap_${groupId}`);
-      if (savedCap) setMaxMembersCap(savedCap);
-
       const savedPerms = localStorage.getItem(`group_permissions_${groupId}`);
       if (savedPerms) {
         try {
@@ -537,15 +536,11 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
         title: settingsTitle.trim(),
         description: settingsDesc.trim() || undefined,
         is_public: settingsPublic,
+        ...(isOwner ? { max_members: maxMembersCap.trim() ? Number(maxMembersCap) : null } : {}),
       });
 
       if (res.success) {
         if (typeof window !== 'undefined') {
-          if (maxMembersCap.trim()) {
-            localStorage.setItem(`group_cap_${groupId}`, maxMembersCap.trim());
-          } else {
-            localStorage.removeItem(`group_cap_${groupId}`);
-          }
           localStorage.setItem(
             `group_permissions_${groupId}`,
             JSON.stringify({
@@ -1124,7 +1119,6 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 {filteredMaterials.map((m) => {
-                  const badgeStyle = getFormatBadgeStyle(m.file_format);
                   return (
                     <div
                       key={m.id}
@@ -1139,22 +1133,9 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                         gap: '0.75rem',
                       }}
                     >
-                      {/* Left side: Format badge, Title & Metadata */}
+                      {/* Left side: File type, Title & Metadata */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', minWidth: 0, flex: 1 }}>
-                        <span
-                          style={{
-                            fontSize: '0.625rem',
-                            fontWeight: 700,
-                            textTransform: 'uppercase',
-                            padding: '0.12rem 0.4rem',
-                            borderRadius: 'var(--radius-sm)',
-                            backgroundColor: badgeStyle.bg,
-                            color: badgeStyle.text,
-                            border: `1px solid ${badgeStyle.border}`,
-                            letterSpacing: '0.4px',
-                            flexShrink: 0,
-                          }}
-                        >
+                        <span className="badge">
                           {m.file_format.toUpperCase()}
                         </span>
 
@@ -1336,6 +1317,9 @@ export default function SingleGroupPage({ params }: { params: Promise<{ groupId:
                   <input
                     type="number"
                     min="1"
+                    max="2147483647"
+                    step="1"
+                    className="form-input"
                     placeholder="No limit (unlimited)"
                     value={maxMembersCap}
                     onChange={(e) => setMaxMembersCap(e.target.value)}

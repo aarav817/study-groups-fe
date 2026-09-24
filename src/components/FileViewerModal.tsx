@@ -214,19 +214,7 @@ export default function FileViewerModal({ material, onClose, onDownload }: FileV
         >
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
-              <span
-                style={{
-                  fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  padding: '0.15rem 0.5rem',
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: badgeStyle.bg,
-                  color: badgeStyle.text,
-                  border: `1px solid ${badgeStyle.border}`,
-                  letterSpacing: '0.5px',
-                }}
-              >
+              <span className="badge">
                 {material.file_format.toUpperCase()}
               </span>
               <h2

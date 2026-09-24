@@ -10,6 +10,7 @@ interface StudyGroup {
   description?: string | null;
   is_public: boolean;
   member_count?: number;
+  max_members: number | null;
   is_member?: boolean;
   creator_name?: string;
 }
@@ -27,6 +28,7 @@ export default function GroupsPage() {
   const [newTitle, setNewTitle] = useState<string>('');
   const [newDescription, setNewDescription] = useState<string>('');
   const [isPublic, setIsPublic] = useState<boolean>(true);
+  const [maxMembers, setMaxMembers] = useState<string>('20');
   const [createError, setCreateError] = useState<string>('');
 
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
@@ -75,12 +77,14 @@ export default function GroupsPage() {
         title: newTitle,
         description: newDescription,
         is_public: isPublic,
+        max_members: maxMembers.trim() ? Number(maxMembers) : null,
       });
       if (res.success) {
         setShowCreateModal(false);
         setNewTitle('');
         setNewDescription('');
         setIsPublic(true);
+        setMaxMembers('20');
         setViewTab('my');
         fetchGroups();
       } else {
@@ -252,7 +256,7 @@ export default function GroupsPage() {
                 <div className="card-meta">
                   <span>Created by {group.creator_name}</span>
                   <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                    {group.member_count} {group.member_count === 1 ? 'member' : 'members'}
+                    {group.member_count ?? 0}{group.max_members != null ? ` / ${group.max_members} members` : ' members · No limit'}
                   </span>
                 </div>
 
@@ -313,6 +317,25 @@ export default function GroupsPage() {
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
                 />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="max-members">Maximum members</label>
+                <input
+                  id="max-members"
+                  className="form-input"
+                  type="number"
+                  min="1"
+                  max="2147483647"
+                  step="1"
+                  value={maxMembers}
+                  onChange={(e) => setMaxMembers(e.target.value)}
+                  placeholder="No limit"
+                  aria-describedby="max-members-help"
+                />
+                <p id="max-members-help" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                  Includes you. Leave blank for no limit.
+                </p>
               </div>
 
               <div className="form-group">

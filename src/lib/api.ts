@@ -104,11 +104,11 @@ export const api = {
       request(`/groups${query ? `?q=${encodeURIComponent(query)}` : ''}`, { method: 'GET' }),
     listPublic: (query?: string) =>
       request(`/groups?public=true${query ? `&q=${encodeURIComponent(query)}` : ''}`, { method: 'GET' }),
-    create: (data: { title: string; description?: string; is_public?: boolean }) =>
+    create: (data: { title: string; description?: string; is_public?: boolean; max_members?: number | null }) =>
       request('/groups', { method: 'POST', body: JSON.stringify(data) }),
     getDetails: (groupId: string) =>
       request(`/groups/${groupId}`, { method: 'GET' }),
-    update: (groupId: string, data: { title?: string; description?: string; is_public?: boolean }) =>
+    update: (groupId: string, data: { title?: string; description?: string; is_public?: boolean; max_members?: number | null }) =>
       request(`/groups/${groupId}`, { method: 'PATCH', body: JSON.stringify(data) }),
     delete: (groupId: string) =>
       request(`/groups/${groupId}`, { method: 'DELETE' }),

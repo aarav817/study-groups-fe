@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Color Palette: Light Blue Canvas with Navy/Deep Blue Accents & White Surfaces - Zero Gradients */
   --bg-app: #edf4fa;
   --bg-surface: #ffffff;
   --bg-subtle: #f4f8fc;
@@ -19,7 +18,7 @@
   --text-inverse: #ffffff;
 
   /* Primary Navy & Royal Blue Accents */
-  --primary-navy: #0f294a;
+  --primary-navy: #214e83;
   --primary-color: #1d4ed8;
   --primary-hover: #1e40af;
   --primary-light: #e0edfd;
@@ -38,11 +37,9 @@
   --accent-rose-bg: #ffe4e6;
   --accent-rose-border: #fecdd3;
 
-  /* Typography */
   --font-serif: 'EB Garamond', Georgia, Cambria, serif;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Shadows */
   --shadow-sm: 0 1px 2px rgba(15, 34, 56, 0.05);
   --shadow-md: 0 4px 12px rgba(15, 34, 56, 0.07);
   --shadow-lg: 0 10px 25px rgba(15, 34, 56, 0.1);
@@ -69,7 +66,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Typography Utilities */
 .font-serif {
   font-family: var(--font-serif);
 }
@@ -78,7 +74,6 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Layout */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -86,10 +81,9 @@ body {
   background-color: var(--bg-app);
 }
 
-/* Top Header */
 .top-header {
   height: 54px;
-  border-bottom: 1px solid var(--border-default);
+  border-bottom: 2px solid var(--primary-navy);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -181,25 +175,24 @@ body {
   background-color: var(--accent-rose-bg) !important;
 }
 
-/* User Avatar Header Pill */
+/* Account link in the header. */
 .user-avatar-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.5rem;
-  border-radius: 20px;
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background-color: transparent;
+  border: 1px solid transparent;
   text-decoration: none;
   color: var(--text-primary);
   font-size: 0.8125rem;
   font-weight: 500;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 
 .user-avatar-pill:hover {
   background-color: var(--bg-hover);
-  border-color: var(--border-strong);
 }
 
 .avatar-circle {
@@ -217,7 +210,6 @@ body {
   text-transform: uppercase;
 }
 
-/* Main Body & Sidebar */
 .main-body {
   display: flex;
   flex: 1;
@@ -272,6 +264,7 @@ body {
   background-color: var(--primary-subtle);
   color: var(--primary-color);
   border-color: var(--primary-light);
+  border-left: 3px solid var(--primary-navy);
   font-weight: 600;
 }
 
@@ -289,7 +282,6 @@ body {
   color: #ffffff;
 }
 
-/* Content Area */
 .content-area {
   flex: 1;
   padding: 1.5rem;
@@ -321,7 +313,6 @@ body {
   margin-top: 0.15rem;
 }
 
-/* Buttons (Solid colors only) */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -374,7 +365,7 @@ body {
 }
 
 .btn-navy:hover:not(:disabled) {
-  background-color: #081628;
+  background-color: #193e6b;
 }
 
 .btn-danger {
@@ -410,7 +401,11 @@ body {
   font-size: 0.6875rem;
 }
 
-/* Cards & Elevated Containers */
+.page-header {
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--primary-navy);
+}
+
 .card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-default);
@@ -462,47 +457,32 @@ body {
   margin-top: auto;
 }
 
-/* Badges (Solid Pill Tags) */
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 7px;
-  border-radius: var(--radius-sm);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-secondary);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.badge-blue {
-  background-color: var(--primary-subtle);
-  color: var(--primary-color);
-  border: 1px solid var(--primary-light);
-}
-
-.badge-navy {
-  background-color: var(--bg-muted);
-  color: var(--primary-navy);
-  border: 1px solid var(--border-default);
+.badge + .badge {
+  margin-left: 0.25rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--border-default);
 }
 
 .badge-emerald {
-  background-color: var(--accent-emerald-bg);
   color: var(--accent-emerald);
-  border: 1px solid var(--accent-emerald-border);
 }
 
 .badge-amber {
-  background-color: var(--accent-amber-bg);
   color: var(--accent-amber);
-  border: 1px solid var(--accent-amber-border);
 }
 
 .badge-rose {
-  background-color: var(--accent-rose-bg);
   color: var(--accent-rose);
-  border: 1px solid var(--accent-rose-border);
 }
 
 /* Forms & Textboxes */
@@ -582,7 +562,6 @@ body {
   cursor: pointer;
 }
 
-/* Authentication Container */
 .auth-container {
   max-width: 400px;
   margin: 3rem auto;
@@ -712,9 +691,9 @@ body {
   font-size: 0.6875rem;
   font-weight: 500;
   padding: 2px 4px;
-  border-radius: var(--radius-sm);
-  background-color: var(--primary-navy);
-  color: #ffffff;
+  border-left: 2px solid var(--primary-color);
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
   margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
@@ -722,7 +701,6 @@ body {
   line-height: 1.2;
 }
 
-/* Context Menu */
 .context-menu {
   position: fixed;
   z-index: 200;
@@ -768,7 +746,6 @@ body {
   margin: 0.25rem 0;
 }
 
-/* Confirmation Dialog */
 .confirm-overlay {
   position: fixed;
   top: 0;
@@ -827,7 +804,6 @@ body {
   letter-spacing: 0.04em;
 }
 
-/* Icon Buttons */
 .icon-btn {
   display: inline-flex;
   align-items: center;
@@ -856,7 +832,6 @@ body {
   color: var(--accent-rose);
 }
 
-/* Segmented Control Bar */
 .segmented-control {
   display: inline-flex;
   background-color: var(--bg-muted);
@@ -890,7 +865,6 @@ body {
   box-shadow: 0 1px 2px rgba(15, 34, 56, 0.06);
 }
 
-/* Clean Alert Banners */
 .alert-banner {
   padding: 0.625rem 0.875rem;
   border-radius: var(--radius-md);
@@ -920,7 +894,6 @@ body {
   color: var(--primary-color);
 }
 
-/* Light Bubble Chat System */
 .chat-bubble-row {
   display: flex;
   gap: 0.5rem;
@@ -984,3 +957,28 @@ body {
   word-break: break-word;
 }
 
+.landing-panel {
+  max-width: 800px;
+  margin: 3rem 1rem;
+  padding: 3rem 1.5rem 1rem;
+  text-align: center;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-top: 3px solid var(--primary-navy);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+}
+
+.landing-accent {
+  width: 48px;
+  height: 4px;
+  margin: 0 auto 1.5rem;
+  background-color: var(--primary-color);
+  border-radius: 4px;
+}
+
+@media (min-width: 832px) {
+  .landing-panel {
+    margin: 3rem auto;
+  }
+}

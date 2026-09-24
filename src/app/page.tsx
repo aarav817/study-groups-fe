@@ -8,7 +8,8 @@ export default function LandingPage() {
   const { user } = useAuth();
 
   return (
-    <div style={{ maxWidth: '880px', margin: '0 auto', padding: '3rem 1.5rem', textAlign: 'center' }}>
+    <div className="landing-panel">
+      <div className="landing-accent" aria-hidden="true" />
       <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.65rem', marginBottom: '0.65rem' }}>
         <svg style={{ width: '2rem', height: '2rem', color: 'var(--primary-color)', flexShrink: 0 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -71,45 +72,6 @@ export default function LandingPage() {
             </Link>
           </>
         )}
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '1rem',
-          textAlign: 'left',
-        }}
-      >
-        <div className="card">
-          <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-            Workspaces
-          </div>
-          <h3 className="card-title" style={{ fontSize: '1.05rem' }}>Course Study Groups</h3>
-          <p className="card-description" style={{ margin: 0 }}>
-            Dedicated study channels for your university courses.
-          </p>
-        </div>
-
-        <div className="card">
-          <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-            Materials
-          </div>
-          <h3 className="card-title" style={{ fontSize: '1.05rem' }}>Organized Notes</h3>
-          <p className="card-description" style={{ margin: 0 }}>
-            Upload, browse, and organize notes from yourself and your classmates.
-          </p>
-        </div>
-
-        <div className="card">
-          <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-            Messaging
-          </div>
-          <h3 className="card-title" style={{ fontSize: '1.05rem' }}>Direct Chat Messaging</h3>
-          <p className="card-description" style={{ margin: 0 }}>
-            Connect 1-on-1 with others with a private messaging system.
-          </p>
-        </div>
       </div>
     </div>
   );
