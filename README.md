@@ -13,3 +13,5 @@ Corresponding API: [study-groups-api](https://github.com/aarav817/study-groups-a
 - **Calendar & Events:** Ability to create group events, view attendees, and plot events on a calendar view.
 - **Discussions:** Group discussion text channels and direct messaging.
 - **Admin Dashboard:** Traffic monitoring, worker request analytics, and system statistics.
+
+Originally deployed with a Railway free trial.
