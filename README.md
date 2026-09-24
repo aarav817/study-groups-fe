@@ -5,7 +5,6 @@ Corresponding API: [study-groups-api](https://github.com/aarav817/study-groups-a
 - **Framework:** Next.js 15, React
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
-- **Deployment:** Railway
 - **Database:** Redis, PostgreSQL
 ## Core Features
 - **Authentication:** Session tokens and management, login, registration, and email verification on account creation.
